@@ -1,2 +1,5 @@
-./idea
-gen_dataset/data/
+.idea/
+gen_dataset/data/*
+**/__pycache__/
+gen_dataset/helpers/FLamby/*
+gen_dataset/helpers/script_helper.py
