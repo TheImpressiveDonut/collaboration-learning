@@ -6,12 +6,41 @@ import numpy as np
 
 from client.client import Client
 
+# @todo some type might be overkill
 Data = Tuple[np.ndarray, np.ndarray]
 ClientsData = List[Data]
 Id = int
 Clients = Dict[Id, Client]
 DataStatistics = List[Tuple[int, int]]
 ClientsDataStatistics = List[DataStatistics]
+
+
+class TrustName(StrEnum):
+    static = auto()
+    dynamic = auto()
+    naive = auto()
+
+
+class ConsensusName(StrEnum):
+    soft_assignment = auto()
+    majority_vote = auto()
+
+
+class SimMeasureName(StrEnum):
+    cosine = auto()
+    true_label = auto()
+
+
+class ModelName(StrEnum):
+    resnet = auto()
+    cnn = auto()
+    fnn = auto()
+    efficient_net = auto()
+
+
+class ModeName(StrEnum):
+    normal = auto()
+    flipped = auto()
 
 
 class DatasetName(StrEnum):
@@ -24,6 +53,11 @@ class SettingName(StrEnum):
     normal = auto()
     two_sets = auto()
     evil = auto()
+
+
+class MetricName(StrEnum):
+    acc = auto()
+    bacc = auto()
 
 
 class Config(object):
@@ -76,7 +110,7 @@ class Config(object):
         )
         return hash.hexdigest()
 
-    def __str__(self) -> str:
+    def __str__(self) -> str:  # @todo probably do not have to override
         return (
             f'Config:\n'
             f'\t{self.dataset_name}\n'

@@ -1,5 +1,6 @@
 # uses script from
 # https://github.com/owkin/FLamby/blob/main/flamby/datasets/fed_isic2019/dataset_creation_scripts/download_isic.py
+# needs a recent version of conda and python 3.10-3.11
 import os
 import shutil
 import subprocess

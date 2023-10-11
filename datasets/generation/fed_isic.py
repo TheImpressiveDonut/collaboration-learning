@@ -12,8 +12,6 @@ from utils.folders import get_raw_path
 from utils.types import Config, ClientsData, ClientsDataStatistics
 
 
-# @todo NOT FINISHED
-
 def fed_isic(config: Config) -> Tuple[
     ClientsData, ClientsData, ClientsData, ClientsDataStatistics
 ]:
@@ -37,27 +35,25 @@ def fed_isic(config: Config) -> Tuple[
 
     num_rows = big_table.shape[0]
     client_names = np.unique(big_table['datasets'])
-    clients_data
+    clients_data = []
     for j in range(config.num_clients):
-        image[j] = []
-        image_label[j] = []
+        clients_data.append((np.array([]), np.array([])))
 
     for i in range(num_rows):
         for j in range(config.num_clients):
             if big_table['datasets'][i] == client_names[j]:
                 image_name = os.path.join(image_dir, big_table['image'][i] + '.jpg')
                 img = transform(Image.open(image_name))
-                image[j].append(img.numpy())
-                image_label[j].append(big_table['label'][i])
+                clients_data[j] = np.stack((clients_data[j][0], img.numpy()), axis=0), np.append(clients_data[j][1],
+                                                                                                 big_table['label'][i])
     for j in range(config.num_clients):
-        image[j] = np.stack(image[j], axis=0)
-        print(image[j].shape)
+        print(clients_data[j][0].shape)
 
     statistics = []
     for client in range(config.num_clients):
         statistics.append([])
-        for val, count in np.unique(image_label[client], return_counts=True):
+        for val, count in np.unique(clients_data[client][1], return_counts=True):
             statistics[client].append((val, count))
 
-    train_data, test_data, ref_data = train_test_ref_split(image, image_label, config, mode='by-number')
+    train_data, test_data, ref_data = train_test_ref_split(clients_data, config, mode='by-number')
     return train_data, test_data, ref_data, statistics

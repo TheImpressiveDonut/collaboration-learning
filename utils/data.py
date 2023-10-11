@@ -7,11 +7,9 @@ from utils.exceptions import UnknownPartitionArgumentException, UnknownSplitData
 from utils.types import Config, ClientsData, Data, ClientsDataStatistics
 
 
-# @todo NOT FINISHED REFACTOR
-
 def __get_pat_partition(dataset_label: np.ndarray, config: Config) -> List[np.ndarray]:
     data_idx_map = [np.array([], dtype=int) for _ in range(config.num_clients)]
-    least_samples = config.batch_size / (1 - config.train_size) # remove batch size
+    least_samples = config.batch_size / (1 - config.train_size)  # remove batch size
     idx_for_each_class = []
     for i in range(config.num_classes):
         idx_for_each_class.append(np.argwhere(dataset_label == i).flatten())

@@ -10,12 +10,12 @@ import torchvision
 from datasets.generation.cifar_x import cifar_x
 from datasets.generation.fed_isic import fed_isic
 from datasets.parser import get_parser
-from utils.exceptions import UnknownDatasetNameException
+from utils.exceptions import UnknownNameCustomEnumException
 from utils.folders import check_if_config_exist
 from utils.memory import save_dataset
 from utils.types import ClientsData, ClientsDataStatistics, Config, DatasetName
 
-# @todo shouldn't we try with different seeds ?
+# @todo shouldn't we try with different seeds for real experiments ?
 random.seed(1)
 np.random.seed(1)
 
@@ -30,7 +30,7 @@ def create_dataset(config: Config) -> Tuple[ClientsData, ClientsData, ClientsDat
             # num_classes = 8, num_clients = 6
             return fed_isic(config)
         case _:
-            raise UnknownDatasetNameException(config.dataset_name)
+            raise UnknownNameCustomEnumException(config.dataset_name, DatasetName)
 
 
 print('------ Generating dataset ------')

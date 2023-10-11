@@ -38,5 +38,5 @@ Here we offer different combinations for training:
     - naive (fixed as 1/N each entry throughout training)
 
 ```bash
-python main.py -ds[Cifar10/Cifar100/] -ncl[10] -lam[0.5 / 0.0] -setting[normal/2sets/evil] -trust[dynamic/static/naive]
+python training.py -ds[Cifar10/Cifar100/] -ncl[10] -lam[0.5 / 0.0] -setting[normal/2sets/evil] -trust[dynamic/static/naive]
 ```

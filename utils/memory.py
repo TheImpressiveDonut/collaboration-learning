@@ -7,7 +7,7 @@ from typing import Tuple
 import ujson
 
 from utils.folders import get_config_path, get_save_train_test_ref_path
-from utils.types import ClientsData, Config
+from utils.types import ClientsData, Config, DatasetName
 
 
 def __save_config(config: Config, path: str) -> None:
@@ -25,8 +25,8 @@ def __load_data(path: str) -> ClientsData:
         return pickle.load(f)
 
 
-def load_dataset(config: Config) -> Tuple[ClientsData, ClientsData, ClientsData]:
-    train_path, test_path, ref_path = get_save_train_test_ref_path(config)
+def load_dataset(path: str) -> Tuple[ClientsData, ClientsData, ClientsData]:
+    train_path, test_path, ref_path = path
     return __load_data(train_path), __load_data(test_path), __load_data(ref_path)
 
 

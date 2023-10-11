@@ -8,16 +8,17 @@ import torch
 from torch import Tensor
 from torch.utils.data import DataLoader
 
-from utils.types import Data
+from utils.types import Data, ClientsData
 
 
 class PDLDataSet(torch.utils.data.Dataset):
     def __init__(self, data: Data, mode: str = 'normal', num_class: int = 10) -> None:
-        self.X = data[0]
+        self.X = torch.from_numpy(data[0])
+        y = torch.from_numpy(data[1])
         if mode == 'normal':
-            self.y = data[1]
+            self.y = y
         elif mode == 'randomized':
-            self.y = random.sample(list(data[1]), len(data[1]))
+            self.y = random.sample(data[1].tolist(), data[1].shape[0])
         elif mode == 'flipped':
             label_shift = random.randint(1, num_class - 1)
             self.y = list((data[1] + label_shift) % num_class)
@@ -30,14 +31,14 @@ class PDLDataSet(torch.utils.data.Dataset):
         label = self.y[idx]
         return img, label
 
-# @todo maybe juste rename SharedDara
+
 class SharedData(torch.utils.data.Dataset):
     def __init__(self, X: Tensor, Y: Tensor) -> None:
         self.X = X
         self.Y = Y
 
     def __len__(self) -> int:
-        return self.X.size()[0]
+        return self.X.size(dim=0)
 
     def __getitem__(self, idx: int) -> Tuple[Tensor, Tensor, int]:
         img = self.X[idx, :, :, :]
@@ -60,35 +61,10 @@ def dl_to_sampler(dl) -> Callable[[], Tensor]:
     return sample
 
 
-
-
-
-# @todo to remove
-def get_ref_data(curr_path: str) -> Tuple[Tensor, Tensor]:
-    ref_x = []
-    ref_y = []
-    # ref_client = []
-    for dir in os.listdir(curr_path):
-        tmp_path = os.path.join(curr_path, dir)
-        with open(tmp_path, 'rb') as f:
-            tmp = np.load(f, allow_pickle=True)['data'].tolist()
-        ref_x.extend(tmp['x'])
-        ref_y.extend(tmp['y'])
-        # ref_client.extend(dir[:-4]*len(ref_y))
-    ref_X = torch.tensor(np.array(ref_x))
-    ref_y = torch.tensor(ref_y)
-    return ref_X, ref_y
-
-# @todo to remove
-def get_ref_labels_by_client(curr_path: str) -> Dict[]:
-    ref_labels_by_clients = {}
-    for dir in os.listdir(curr_path):
-        tmp_path = os.path.join(curr_path, dir)
-        client_id = int(dir[:-4])
-        with open(tmp_path, 'rb') as f:
-            tmp = np.load(f, allow_pickle=True)['data'].tolist()
-        ref_labels_by_clients[client_id] = tmp['y']
-    return ref_labels_by_clients
+def transform_ref_data(ref_data: ClientsData) -> Tuple[Tensor, Tensor]:
+    ref_X = np.concatenate(list(map(lambda x: x[0], ref_data)))
+    ref_y = np.concatenate(list(map(lambda x: x[1], ref_data)))
+    return torch.from_numpy(ref_X), torch.from_numpy(ref_y)
 
 
 def save_results(trust_weight_dict, test_accuracy_dict, ref_accuracy_dict, res_path, args) -> None:
