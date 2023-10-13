@@ -8,25 +8,24 @@ from sklearn.metrics import balanced_accuracy_score
 from torch import Tensor
 from torch.utils.data import DataLoader
 
-from client_utils import select_client_model, CosineSimilarity, TrueLabelSimilarity
+from client.client_utils import select_client_model, CosineSimilarity, TrueLabelSimilarity
 from models.models_utils import PDLDataSet, dl_to_sampler
 from utils.exceptions import UnknownNameCustomEnumException
-from utils.types import Data, ModelName, ClientsData, TrustName, ConsensusName, MetricName
+from utils.types import Data, ModelName, ClientsData, TrustName, ConsensusName, MetricName, ModeName
 from utils.types import DatasetName, SimMeasureName
 
 
 class Client(object):
-    def __init__(
-            self,
-            worker_index: int, dataset_name: DatasetName, model_name: ModelName,
-            train_data: Data, test_data: Data, ref_data: ClientsData,
-            num_classes: int, num_clients: int, num_channels: int, eff_net_arch_name: str,
-            learning_rate: float, lambda_: float, device: torch.device,
-            train_batch_size: int, test_batch_size: int,
-            sim_measure: SimMeasureName, cosine_regularized: bool, mode: str,
-            consensus_mode: ConsensusName, trust_update: TrustName, trust_update_frequency: int,
-            pretraining_rounds: int,
-    ) -> None:
+    def __init__(self,
+                 worker_index: int, dataset_name: DatasetName, model_name: ModelName,
+                 train_data: Data, test_data: Data, ref_data: ClientsData,
+                 num_classes: int, num_clients: int, num_channels: int, eff_net_arch_name: str,
+                 learning_rate: float, lambda_: float, device: torch.device,
+                 train_batch_size: int, test_batch_size: int,
+                 sim_measure: SimMeasureName, cosine_regularized: bool, mode: ModeName,
+                 consensus_mode: ConsensusName, trust_update: TrustName, trust_update_frequency: int,
+                 pretraining_rounds: int,
+                 ) -> None:
         self.id = worker_index
         self.device = device
         self.model = select_client_model(dataset_name, model_name, num_classes, num_channels, eff_net_arch_name)
@@ -41,7 +40,7 @@ class Client(object):
         self.num_clients = num_clients
         self.trust_update_frequency = trust_update_frequency
         self.pretraining_rounds = pretraining_rounds
-        self.trust_weights = torch.empty()
+        self.trust_weights = None
 
         match sim_measure:
             case SimMeasureName.cosine:

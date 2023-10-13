@@ -1,16 +1,11 @@
 import hashlib
 from enum import StrEnum, auto
-from typing import Tuple, List, Dict
+from typing import Tuple, List
 
 import numpy as np
 
-from client.client import Client
-
-# @todo some type might be overkill
 Data = Tuple[np.ndarray, np.ndarray]
 ClientsData = List[Data]
-Id = int
-Clients = Dict[Id, Client]
 DataStatistics = List[Tuple[int, int]]
 ClientsDataStatistics = List[DataStatistics]
 

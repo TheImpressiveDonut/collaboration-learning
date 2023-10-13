@@ -1,8 +1,6 @@
 from enum import StrEnum
 from typing import Type
 
-from utils.types import DatasetName, SettingName, MetricName
-
 
 class UnknownNameCustomEnumException(Exception):
 

@@ -1,11 +1,9 @@
-from argparse import Namespace
 from typing import Tuple, Dict
 
 import numpy as np
 
-from client.client import Client
 from utils.exceptions import UnknownNameCustomEnumException
-from utils.types import Clients, DatasetName, SettingName, ClientsData, ModeName, ModelName
+from utils.types import DatasetName, SettingName, ModeName, ModelName
 
 
 def setting_selection(setting: SettingName, dataset_name: DatasetName, num_clients: int

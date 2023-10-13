@@ -1,4 +1,4 @@
-import argparse
+from typing import Dict
 
 import numpy as np
 import torch
@@ -8,15 +8,14 @@ from torch.utils.data import DataLoader
 from tqdm import tqdm
 
 from client.client import Client
-from models.models_utils import save_results
 from utils.exceptions import UnknownNameCustomEnumException
-from utils.types import Clients, MetricName
+from utils.types import MetricName
 
 
 class Trainer(object):
 
     def __init__(self,
-                 clients: Clients,
+                 clients: Dict[int, Client],
                  ref_loader: DataLoader,
                  clients_sample_size: np.ndarray,
                  pretraining_rounds: int,
@@ -49,6 +48,20 @@ class Trainer(object):
             self.trust_weights_round[current_global_epoch] = []
             self.__global_epoch(current_global_epoch)
 
+            print('round %i finished' % current_global_epoch)
+            print('local accuracy after round', str(current_global_epoch), ':',
+                  np.mean(self.test_accuracies[current_global_epoch]))
+            print('local accuracy:', self.test_accuracies[current_global_epoch])
+            print('global accuracy after round', str(current_global_epoch), ':',
+                  np.mean(self.ref_accuracies[current_global_epoch]))
+            print('global acc:', self.ref_accuracies[current_global_epoch])
+
+            if len(self.trust_weights_round[current_global_epoch]) > 0:
+                self.trust_weights_round[current_global_epoch] = torch.stack(
+                    self.trust_weights_round[current_global_epoch])
+
+        return self.train_accuracies, self.test_accuracies, self.ref_accuracies, self.soft_decisions
+
     def __global_epoch(self, current_global_epoch: int):
 
         # @todo some of parallel or bigger batch_size
@@ -60,7 +73,7 @@ class Trainer(object):
                     self.soft_decisions[current_global_epoch - 1], current_global_epoch)
                 self.trust_weights_round[current_global_epoch].append(trust_weight)
 
-            for current_local_epoch in range(self.num_local_epochs): # @todo change local epochs over time
+            for current_local_epoch in tqdm(range(self.num_local_epochs), position=2, leave=False, desc='local epoch'):  # @todo change local epochs over time
                 self.__local_epoch(client, soft_decision_target)
 
             self.train_accuracies.append(client.test(self.metric_name, mode='train'))
@@ -72,23 +85,5 @@ class Trainer(object):
             ref_pred = torch.argmax(soft_decision, dim=1)
             self.ref_accuracies.append(self.metric(self.ref_loader, ref_pred))
 
-
     def __local_epoch(self, client: Client, soft_decision_target: Tensor):
         client.train(self.ref_loader, soft_decision_target)
-
-
-
-
-if len(trust_weight_tmp) > 0:
-    trust_weight_dict[round] = torch.stack(trust_weight_tmp)
-
-print('round %i finished' % round)
-print('local accuracy after round', str(round), ':', np.mean(test_accuracy_dict[round]))
-print('local accuracy:', test_accuracy_dict[round])
-print('global accuracy after round', str(round), ':', np.mean(ref_accuracy_dict[round]))
-print('global acc:', ref_accuracy_dict[round])
-
-if save_results(trust_weight_dict, test_accuracy_dict, ref_accuracy_dict, res_path, args) == 1:
-    print('saved file successfully! The results are under', args.res_path)
-
-return train_accs, test_accs, ref_accs, soft_decisions

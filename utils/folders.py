@@ -1,8 +1,8 @@
 import os
 from typing import Tuple
 
-from utils.types import DatasetName, Config
 from utils.mlo_folders import get_mlo_dir_dataset_path
+from utils.types import DatasetName, Config
 
 
 def __create_folder(dir_path: str) -> None:
@@ -12,10 +12,6 @@ def __create_folder(dir_path: str) -> None:
 
 def __get_dataset_path(dataset_name: DatasetName) -> True:
     return f'{get_mlo_dir_dataset_path()}{dataset_name}/'
-
-
-def __get_data_path(path: str) -> Tuple[str, str, str]:
-    return f'{path}train_data.bz2', f'{path}test_data.bz2', f'{path}ref_data.bz2'
 
 
 def __get_path_new_dir(dataset_name: DatasetName, dir: str, create_dir: bool = True) -> str:

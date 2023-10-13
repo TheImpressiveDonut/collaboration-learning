@@ -1,12 +1,14 @@
 import argparse
+from typing import Tuple
 
-from utils.types import DatasetName
+from utils.types import DatasetName, TrustName, ConsensusName, SettingName, SimMeasureName, MetricName
 
 
 # @todo finish correct parser
 
 def get_args() -> Tuple[
-    int, int, int, int, int, float,
+    int, int, int, int, int, float, float, int, int, TrustName, ConsensusName, DatasetName,
+    int, int, int, SimMeasureName, int, bool, SettingName, str, MetricName, int
 ]:
     parser = argparse.ArgumentParser()
     parser.add_argument("-expno", "--experiment_no", default=0, type=int)
@@ -28,7 +30,7 @@ def get_args() -> Tuple[
     parser.add_argument('-test_bs', '--test_batch_size', type=int, default=256)
     parser.add_argument('-sim', '--sim_measure', type=str, default='cosine', help='[true_label,cosine]')
     parser.add_argument('-prer', '--pretraining_rounds', type=int, default=5)
-    parser.add_argument('-cmode', '--cmode', type=str, default='regularized')
+    parser.add_argument('-cmode', '--cmode', action='store_true')
     parser.add_argument('-setting', '--setting', type=str, default='normal', help='choose between [2sets, evil,normal]')
     parser.add_argument('-arch_name', '--arch_name', type=str, default='efficientnet-b0',
                         help='only when selects fed_isic')

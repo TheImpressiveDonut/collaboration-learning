@@ -1,12 +1,13 @@
 import bz2
 import datetime
+import os
 import pickle
 import time
 from typing import Tuple
 
 import ujson
 
-from utils.folders import get_config_path, get_save_train_test_ref_path
+from utils.folders import get_config_path, get_save_train_test_ref_path, __get_dataset_path
 from utils.types import ClientsData, Config, DatasetName
 
 
@@ -25,8 +26,14 @@ def __load_data(path: str) -> ClientsData:
         return pickle.load(f)
 
 
-def load_dataset(path: str) -> Tuple[ClientsData, ClientsData, ClientsData]:
-    train_path, test_path, ref_path = path
+def load_dataset(dataset_name: DatasetName) -> Tuple[ClientsData, ClientsData, ClientsData]:
+    diff_config = os.listdir(f'{__get_dataset_path(dataset_name)}save/')
+    print(f'folders for {dataset_name}:')
+    for idx, folder in enumerate(diff_config):
+        print(f'{idx}: {folder}')
+    choice = int(input())
+    path = f'{__get_dataset_path(dataset_name)}save/{diff_config[choice]}/'
+    train_path, test_path, ref_path = f'{path}train.bz2', f'{path}test.bz2', f'{path}ref.bz2'
     return __load_data(train_path), __load_data(test_path), __load_data(ref_path)
 
 
