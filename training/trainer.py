@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, List
 
 import numpy as np
 import torch
@@ -46,6 +46,10 @@ class Trainer(object):
     def train(self, global_epochs: int):
         for current_global_epoch in tqdm(range(global_epochs), position=0, leave=False, desc='global epochs'):
             self.trust_weights_round[current_global_epoch] = []
+            self.soft_decisions.append([])
+            self.train_accuracies.append([])
+            self.test_accuracies.append([])
+            self.ref_accuracies.append([])
             self.__global_epoch(current_global_epoch)
 
             print('round %i finished' % current_global_epoch)
@@ -70,20 +74,20 @@ class Trainer(object):
                 soft_decision_target = None
             else:
                 soft_decision_target, trust_weight = client.calculate_soft_decision_target(
-                    self.soft_decisions[current_global_epoch - 1], current_global_epoch)
+                    current_global_epoch, self.soft_decisions[current_global_epoch - 1])
                 self.trust_weights_round[current_global_epoch].append(trust_weight)
 
             for current_local_epoch in tqdm(range(self.num_local_epochs), position=2, leave=False, desc='local epoch'):  # @todo change local epochs over time
                 self.__local_epoch(client, soft_decision_target)
 
-            self.train_accuracies.append(client.test(self.metric_name, mode='train'))
-            soft_decision = client.infer_on_refdata(self.ref_loader)
-            self.soft_decisions.append(soft_decision)
+            self.train_accuracies[current_global_epoch].append(client.test(self.metric_name, mode='train'))
+            soft_decision, ref_y = client.infer_on_refdata(self.ref_loader)
+            self.soft_decisions[current_global_epoch].append(soft_decision)
 
-            self.test_accuracies.append(client.test(self.metric_name, mode='test'))
+            self.test_accuracies[current_global_epoch].append(client.test(self.metric_name, mode='test'))
 
             ref_pred = torch.argmax(soft_decision, dim=1)
-            self.ref_accuracies.append(self.metric(self.ref_loader, ref_pred))
+            self.ref_accuracies[current_global_epoch].append(self.metric(ref_y, ref_pred))
 
     def __local_epoch(self, client: Client, soft_decision_target: Tensor):
         client.train(self.ref_loader, soft_decision_target)

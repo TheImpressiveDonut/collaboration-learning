@@ -114,11 +114,11 @@ def train_test_ref_split(clients_data: ClientsData, config: Config, mode: str = 
         if config.ref:
             match mode:
                 case 'by-ratio':
-                    # 80% test, 20% ref
+                    # 80% test_folder, 20% ref
                     X_test, X_ref, y_test, y_ref = train_test_split(
                         X_test, y_test, train_size=0.8, shuffle=True)
                 case 'by-number':
-                    # take 50 random elements of test for ref
+                    # take 50 random elements of test_folder for ref
                     sampled_idx = np.random.choice(X_test.shape[0], min(X_test.shape[0], 50), replace=False).astype(int)
                     X_ref, y_ref = X_test[sampled_idx, :, :, :], y_test[sampled_idx]
                     X_test, y_test = X_test[~sampled_idx, :, :, :], y_test[~sampled_idx]
@@ -134,7 +134,7 @@ def train_test_ref_split(clients_data: ClientsData, config: Config, mode: str = 
         ref_data)
     print('Total number of samples: ', train_num + test_num + ref_num)
     print('The number of train samples: ', train_num)
-    print('The number of test samples: ', test_num)
+    print('The number of test_folder samples: ', test_num)
     if config.ref:
         print('The number of ref samples:', ref_num)
 

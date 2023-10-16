@@ -2,7 +2,7 @@ import getpass
 
 
 def get_mlo_project_name() -> str:
-    return 'collaboration_consensus'
+    return 'personalized_collaboration_consensus'
 
 
 def __get_mlo_ending_path() -> str:
@@ -10,7 +10,7 @@ def __get_mlo_ending_path() -> str:
 
 
 def get_mlo_dir_dataset_path() -> str:
-    return f'/scratch/{__get_mlo_ending_path()}'
+    return f'/home/{__get_mlo_ending_path()}'
 
 
 def get_mlo_dir_checkpoints_path() -> str:

@@ -1,4 +1,3 @@
-from argparse import Namespace
 from typing import List
 
 import torch
@@ -19,12 +18,12 @@ class CosineSimilarity(nn.Module):
         self.regularized = regularized
 
     def forward(self, input: Tensor, target: Tensor) -> float:
-        sim = nn.CosineSimilarity(dim=1, eps=1e-8)(input, target)
+        sim = nn.CosineSimilarity(dim=1)(input, target)
         if self.regularized:
             ent = -torch.sum(target * torch.log(target + 1e-8), dim=1) + 1.0
             # prevent entropy being too small
             sim = torch.div(sim, ent)
-        return torch.mean(sim)[0]
+        return torch.mean(sim).item()
 
 
 class TrueLabelSimilarity(nn.Module):

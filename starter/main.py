@@ -47,9 +47,10 @@ ref_X, ref_y = transform_ref_data(ref_data)
 ref_loader = DataLoader(SharedData(ref_X, ref_y), batch_size=ref_batch_size,
                         shuffle=False, pin_memory=True, num_workers=0)
 
-model_trainer = Trainer(clients, ref_loader, clients_sample_size, pretraining_rounds, num_local_epochs, metric)
+
+#model_trainer = Trainer(clients, ref_loader, clients_sample_size, pretraining_rounds, num_local_epochs, metric)
 print('Training started:')
-train_accuracies, test_accuracies, ref_accuracies, soft_decisions = model_trainer.train(num_global_rounds)
+#train_accuracies, test_accuracies, ref_accuracies, soft_decisions = model_trainer.train(num_global_rounds)
 print('Training finished:')
 
 # if save_results(trust_weight_dict, test_accuracy_dict, ref_accuracy_dict, res_path, args) == 1:
