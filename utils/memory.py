@@ -3,12 +3,19 @@ import datetime
 import os
 import pickle
 import time
-from typing import Tuple
+from typing import Tuple, Any
 
+import torch
 import ujson
 
-from utils.folders import get_config_path, get_save_train_test_ref_path, __get_dataset_path
+from utils.folders import get_config_path, get_save_train_test_ref_path, __get_dataset_path, __create_folder
+from utils.mlo_folders import get_mlo_dir_res_path
 from utils.types import ClientsData, Config, DatasetName
+
+
+def __load_config(path: str) -> Any:
+    with open(path, 'r') as f:
+        return ujson.load(f)
 
 
 def __save_config(config: Config, path: str) -> None:
@@ -27,13 +34,16 @@ def __load_data(path: str) -> ClientsData:
 
 
 def load_dataset(dataset_name: DatasetName) -> Tuple[ClientsData, ClientsData, ClientsData]:
-    diff_config = os.listdir(f'{__get_dataset_path(dataset_name)}save/')
-    print(f'folders for {dataset_name}:')
+    # @todo refactor path management
+    path = f'{__get_dataset_path(dataset_name)}save/'
+    diff_config = os.listdir(path)
+    print(f'Configs for {dataset_name}:')
     for idx, folder in enumerate(diff_config):
-        print(f'{idx}: {folder}')
-    choice = int(input())
+        print(f'{idx}: {__load_config(f"{path}{folder}/config.json")}')
+    choice = int(input('Enter the config index: '))
     path = f'{__get_dataset_path(dataset_name)}save/{diff_config[choice]}/'
     train_path, test_path, ref_path = f'{path}train.bz2', f'{path}test.bz2', f'{path}ref.bz2'
+    print('*' * 7, 'Load train, test and shared data', '*' * 7)
     return __load_data(train_path), __load_data(test_path), __load_data(ref_path)
 
 
@@ -55,3 +65,12 @@ def save_dataset(train_data: ClientsData, test_data: ClientsData, ref_data: Clie
         str(datetime.timedelta(seconds=time_end - time_start))
     )
     print('------ Finish saving to disk ------')
+
+
+def save_results(trust_weights, test_accuracies, ref_accuracies, dataset_name: str, experiment_no: int) -> None:
+    # @todo better path management
+    path = f'{get_mlo_dir_res_path()}{dataset_name}/{experiment_no}/'
+    __create_folder(path)
+    torch.save(trust_weights, f'{path}trust.pt')
+    torch.save(test_accuracies, f'{path}test.pt')
+    torch.save(ref_accuracies, f'{path}ref.pt')

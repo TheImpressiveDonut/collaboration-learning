@@ -18,10 +18,12 @@ class PDLDataSet(torch.utils.data.Dataset):
         if mode == 'normal':
             self.y = y
         elif mode == 'randomized':
-            self.y = random.sample(data[1].tolist(), data[1].shape[0])
+            # @todo check
+            self.y = torch.from_numpy(random.sample(data[1].tolist(), data[1].shape[0]))
         elif mode == 'flipped':
+            # @todo check
             label_shift = random.randint(1, num_class - 1)
-            self.y = list((data[1] + label_shift) % num_class)
+            self.y = torch.from_numpy(list((data[1] + label_shift) % num_class))
 
     def __len__(self) -> int:
         return self.X.shape[0]
@@ -65,24 +67,3 @@ def transform_ref_data(ref_data: ClientsData) -> Tuple[Tensor, Tensor]:
     ref_X = np.concatenate(list(map(lambda x: x[0], ref_data)))
     ref_y = np.concatenate(list(map(lambda x: x[1], ref_data)))
     return torch.from_numpy(ref_X), torch.from_numpy(ref_y)
-
-
-def save_results(trust_weight_dict, test_accuracy_dict, ref_accuracy_dict, res_path, args) -> None:
-    ref_acc_path = os.path.join(res_path, 'global_accuracy_' + str(
-        args.dataset_name) + '_' + args.consensus_mode + '_' + args.sim_measure + '_' + args.trust_update + '_' + 'lam_' + str(
-        args.lambda_) + '_' + str(args.experiment_no) + '_' + 'local_epoch_' + str(
-        args.num_local_epochs) + '_' + args.setting + '.pt')
-
-    test_acc_path = os.path.join(res_path, 'local_accuracy_' + str(
-        args.dataset_name) + '_' + args.consensus_mode + '_' + args.sim_measure + '_' + args.trust_update + '_' + 'lam_' + str(
-        args.lambda_) + '_' + str(args.experiment_no) + '_' + 'local_epoch_' + str(
-        args.num_local_epochs) + '_' + args.setting + '.pt')
-
-    trust_weight_path = os.path.join(res_path, 'trust_weight_dict_' + str(
-        args.dataset_name) + '_' + args.consensus_mode + '_' + args.sim_measure + '_' + args.trust_update + '_' + 'lam_' + str(
-        args.lambda_) + '_' + str(args.experiment_no) + '_' + 'local_epoch_' + str(
-        args.num_local_epochs) + '_' + args.setting + '.pt')
-
-    torch.save(trust_weight_dict, trust_weight_path)
-    torch.save(test_accuracy_dict, test_acc_path)
-    torch.save(ref_accuracy_dict, ref_acc_path)

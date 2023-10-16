@@ -100,7 +100,6 @@ class Client(object):
 
     def soft_assignment_to_hard_assignment(self, soft_decisions: Tensor) -> Tensor:
         # @todo could probably be done without for loop with an identity matrix
-        # @todo no real need for no_grad()
         with torch.no_grad():
             a = torch.argmax(soft_decisions, 1)
             hard_decisions = torch.zeros_like(soft_decisions)
@@ -116,14 +115,13 @@ class Client(object):
             sd_other = soft_decision_list[j]
             sim_ = self.sim(sd_other.to(self.device), sd_eigen.to(self.device))
             sim_list.append(sim_)
-        sim_list = torch.tensor(sim_list)
 
-        self.trust_weights = sim_list / torch.sum(sim_list)
+        self.trust_weights = torch.tensor(sim_list)
+        self.trust_weights /= torch.sum(self.trust_weights)
         return self.trust_weights
 
     @torch.no_grad()
     def calculate_soft_decision_target(self, global_round: int, soft_decisions: List[Tensor]) -> Tuple[Tensor, Tensor]:
-        print(len(soft_decisions), soft_decisions[0].size(), soft_decisions[1].size())
         match self.consensus:
             case ConsensusName.soft_assignment:
                 match self.trust:
@@ -138,7 +136,7 @@ class Client(object):
                     case _:
                         raise UnknownNameCustomEnumException(self.trust, TrustName)
 
-                weighted_soft_decisions = [self.trust_weights[i]*soft_decisions[i] for i in range(self.num_clients)]
+                weighted_soft_decisions = [self.trust_weights[i] * soft_decisions[i] for i in range(self.num_clients)]
                 target = sum(weighted_soft_decisions)
                 target = torch.nn.functional.normalize(target, p=1.0, dim=0)
                 return target, self.trust_weights

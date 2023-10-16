@@ -7,7 +7,7 @@ from models.models_utils import SharedData, transform_ref_data
 from starter.parser import get_args
 from training.setting_selection import setting_selection
 from training.trainer import Trainer
-from utils.memory import load_dataset
+from utils.memory import load_dataset, save_results
 
 (experiment_no, seed, num_clients, num_global_rounds, num_local_epochs, learning_rate, lambda_, num_classes,
  num_channels, trust_update, consensus_mode, dataset_name, train_batch_size, ref_batch_size,
@@ -26,7 +26,8 @@ print('******* the device used is:', device)
 if device.type == 'cuda':
     print('num of gpus:', torch.cuda.device_count())
 
-train_data, test_data, ref_data = load_dataset(dataset_name) # @todo sanity check config
+print('-' * 5, 'Loading dataset', '-' * 5)
+train_data, test_data, ref_data = load_dataset(dataset_name)  # @todo sanity check config
 
 clients_model = setting_selection(setting, dataset_name, num_clients)
 clients = {}
@@ -47,11 +48,10 @@ ref_X, ref_y = transform_ref_data(ref_data)
 ref_loader = DataLoader(SharedData(ref_X, ref_y), batch_size=ref_batch_size,
                         shuffle=False, pin_memory=True, num_workers=0)
 
+model_trainer = Trainer(clients, ref_loader, clients_sample_size, pretraining_rounds, num_local_epochs, metric)
+print('-' * 5, 'Training started', '-' * 5)
+trust_weights, test_accuracies, ref_accuracies = model_trainer.train(num_global_rounds)
 
-#model_trainer = Trainer(clients, ref_loader, clients_sample_size, pretraining_rounds, num_local_epochs, metric)
-print('Training started:')
-#train_accuracies, test_accuracies, ref_accuracies, soft_decisions = model_trainer.train(num_global_rounds)
-print('Training finished:')
+print('-' * 5, 'Saving results', '-' * 5)
+save_results(trust_weights, test_accuracies, ref_accuracies, dataset_name, experiment_no)
 
-# if save_results(trust_weight_dict, test_accuracy_dict, ref_accuracy_dict, res_path, args) == 1:
-# print('saved file successfully! The results are under', args.res_path)

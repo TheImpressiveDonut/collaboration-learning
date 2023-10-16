@@ -44,31 +44,40 @@ class Trainer(object):
         self.trust_weights_round = {}
 
     def train(self, global_epochs: int):
-        for current_global_epoch in tqdm(range(global_epochs), position=0, leave=False, desc='global epochs'):
+        global_epochs = tqdm(range(global_epochs), position=0, leave=False, desc='global epochs')
+        prev_test_accuracy = 0
+        prev_ref_accuracy = 0
+
+        for current_global_epoch in global_epochs:
             self.trust_weights_round[current_global_epoch] = []
             self.soft_decisions.append([])
             self.train_accuracies.append([])
             self.test_accuracies.append([])
             self.ref_accuracies.append([])
-            self.__global_epoch(current_global_epoch)
 
-            print('round %i finished' % current_global_epoch)
-            print('local accuracy after round', str(current_global_epoch), ':',
-                  np.mean(self.test_accuracies[current_global_epoch]))
-            print('local accuracy:', self.test_accuracies[current_global_epoch])
-            print('global accuracy after round', str(current_global_epoch), ':',
-                  np.mean(self.ref_accuracies[current_global_epoch]))
-            print('global acc:', self.ref_accuracies[current_global_epoch])
+            self.__global_epoch(current_global_epoch)
 
             if len(self.trust_weights_round[current_global_epoch]) > 0:
                 self.trust_weights_round[current_global_epoch] = torch.stack(
                     self.trust_weights_round[current_global_epoch])
 
-        return self.train_accuracies, self.test_accuracies, self.ref_accuracies, self.soft_decisions
+            test_accuracy = np.mean(self.test_accuracies[current_global_epoch])
+            ref_accuracy = np.mean(self.ref_accuracies[current_global_epoch])
+            if current_global_epoch == 0:
+                prev_test_accuracy = test_accuracy
+                prev_ref_accuracy = ref_accuracy
+            global_epochs.set_description(
+                f'global epochs (local accuracy: {test_accuracy:.5f}[{test_accuracy - prev_test_accuracy:+.5f}] | '
+                f'global accuracy: {ref_accuracy:.5f}[{ref_accuracy - prev_ref_accuracy:+.5f}])')
+
+            prev_test_accuracy = test_accuracy
+            prev_ref_accuracy = ref_accuracy
+
+        return self.trust_weights_round, self.test_accuracies, self.ref_accuracies
 
     def __global_epoch(self, current_global_epoch: int):
 
-        # @todo some of parallel or bigger batch_size
+        # @todo some of parallel
         for idx, client in tqdm(self.clients.items(), position=1, leave=False, desc='clients'):
             if current_global_epoch < self.pretraining_rounds:
                 soft_decision_target = None
@@ -77,7 +86,8 @@ class Trainer(object):
                     current_global_epoch, self.soft_decisions[current_global_epoch - 1])
                 self.trust_weights_round[current_global_epoch].append(trust_weight)
 
-            for current_local_epoch in tqdm(range(self.num_local_epochs), position=2, leave=False, desc='local epoch'):  # @todo change local epochs over time
+            for current_local_epoch in tqdm(range(self.num_local_epochs), position=2, leave=False,
+                                            desc='local epoch'):  # @todo change local epochs over time
                 self.__local_epoch(client, soft_decision_target)
 
             self.train_accuracies[current_global_epoch].append(client.test(self.metric_name, mode='train'))
