@@ -24,7 +24,7 @@ class Client(object):
                  train_batch_size: int, test_batch_size: int,
                  sim_measure: SimMeasureName, cosine_regularized: bool, mode: ModeName,
                  consensus_mode: ConsensusName, trust_update: TrustName, trust_update_frequency: int,
-                 pretraining_rounds: int,
+                 pretraining_rounds: int, validation_set: bool = False
                  ) -> None:
         self.id = worker_index
         self.device = device
@@ -49,6 +49,18 @@ class Client(object):
                 self.sim = TrueLabelSimilarity(self.id, self.ref_labels, num_clients, self.device)
             case _:
                 raise UnknownNameCustomEnumException(sim_measure, SimMeasureName)
+
+        if validation_set:
+            idx = int(train_data[0].shape[0] * 0.95)
+            val_data = (train_data[0][idx:], train_data[1][idx:])
+            train_data = (train_data[0][:idx], train_data[1][:idx])
+
+            self.val_dataset = PDLDataSet(val_data, mode=mode, num_class=num_classes)
+            self.val_loader = DataLoader(self.val_dataset, batch_size=train_batch_size, shuffle=True,
+                                         pin_memory=True, num_workers=4)
+        else:
+            self.val_dataset = None
+            self.val_loader = None
 
         self.train_dataset = PDLDataSet(train_data, mode=mode, num_class=num_classes)
         self.train_loader = DataLoader(self.train_dataset, batch_size=train_batch_size, shuffle=True,

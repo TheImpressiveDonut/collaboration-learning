@@ -43,7 +43,7 @@ class Trainer(object):
         self.ref_accuracies = []
         self.trust_weights_round = {}
 
-    def train(self, global_epochs: int):
+    def train(self, global_epochs: int, local_validation: bool = False, find_collaborators: bool = False):
         global_epochs = tqdm(range(global_epochs), position=0, leave=False, desc='global epochs')
         prev_test_accuracy = 0
         prev_ref_accuracy = 0
@@ -67,19 +67,20 @@ class Trainer(object):
                 prev_test_accuracy = test_accuracy
                 prev_ref_accuracy = ref_accuracy
             global_epochs.set_description(
-                f'global epochs (local accuracy: {test_accuracy:.5f}[{test_accuracy - prev_test_accuracy:+.5f}] | '
-                f'global accuracy: {ref_accuracy:.5f}[{ref_accuracy - prev_ref_accuracy:+.5f}])')
+                f'global epochs (local accuracy: {test_accuracy:.5f}[{test_accuracy - prev_test_accuracy:+.5f}]'
+                f' | global accuracy: {ref_accuracy:.5f}[{ref_accuracy - prev_ref_accuracy:+.5f}])' if not find_collaborators else ''
+            )
 
             prev_test_accuracy = test_accuracy
             prev_ref_accuracy = ref_accuracy
 
         return self.trust_weights_round, self.test_accuracies, self.ref_accuracies
 
-    def __global_epoch(self, current_global_epoch: int):
+    def __global_epoch(self, current_global_epoch: int, find_collaborators: bool = False):
 
-        # @todo some of parallel
+        # @todo some parallel
         for idx, client in tqdm(self.clients.items(), position=1, leave=False, desc='clients'):
-            if current_global_epoch < self.pretraining_rounds:
+            if current_global_epoch < self.pretraining_rounds or not find_collaborators:
                 soft_decision_target = None
             else:
                 soft_decision_target, trust_weight = client.calculate_soft_decision_target(

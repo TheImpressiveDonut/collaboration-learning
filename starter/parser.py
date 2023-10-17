@@ -8,7 +8,7 @@ from utils.types import DatasetName, TrustName, ConsensusName, SettingName, SimM
 
 def get_args() -> Tuple[
     int, int, int, int, int, float, float, int, int, TrustName, ConsensusName, DatasetName,
-    int, int, int, SimMeasureName, int, bool, SettingName, str, MetricName, int
+    int, int, int, SimMeasureName, int, bool, SettingName, str, MetricName, int, bool
 ]:
     parser = argparse.ArgumentParser()
     parser.add_argument("-expno", "--experiment_no", default=0, type=int)
@@ -37,10 +37,11 @@ def get_args() -> Tuple[
     parser.add_argument('-metric', '--metric', type=str, default='acc', help='choose between bacc and acc')
     parser.add_argument('-trust_freq', '--trust_update_frequency', type=int, default=1,
                         help='how often should trust be updated')
+    parser.add_argument('-graph', '--graph', action='store_true')
     args = parser.parse_args()
 
     return (args.experiment_no, args.seed, args.num_clients, args.num_global_rounds, args.num_local_epochs,
             args.learning_rate, args.lambda_, args.num_classes, args.num_channels, args.trust_update,
             args.consensus_mode, args.dataset_name, args.train_batch_size, args.ref_batch_size, args.test_batch_size,
             args.sim_measure, args.pretraining_rounds, args.cmode, args.setting, args.arch_name, args.metric,
-            args.trust_update_frequency)
+            args.trust_update_frequency, args.graph)

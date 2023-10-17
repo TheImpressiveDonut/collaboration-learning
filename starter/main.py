@@ -12,7 +12,7 @@ from utils.memory import load_dataset, save_results
 (experiment_no, seed, num_clients, num_global_rounds, num_local_epochs, learning_rate, lambda_, num_classes,
  num_channels, trust_update, consensus_mode, dataset_name, train_batch_size, ref_batch_size,
  test_batch_size, sim_measure, pretraining_rounds, cmode, setting, arch_name, metric,
- trust_update_frequency) = get_args()
+ trust_update_frequency, find_collaborators) = get_args()
 print('datasets used:', dataset_name)
 print('setting:', setting)
 
