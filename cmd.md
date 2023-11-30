@@ -16,8 +16,9 @@ rm -rf ~/miniconda3/miniconda.sh
 ~/miniconda3/bin/conda init bash
 
 cd /mlodata1/nwagner/ && rm -rfd personalized-collaboration-learning/ && git clone https://github.com/TheImpressiveDonut/personalized-collaboration-learning.git && cd personalized-collaboration-learning/
+cd /mlodata1/nwagner/personalized-collaboration-learning/ && git pull
 conda env create -f collabllm.yml
 conda activate collabllm && export WANDB_API_KEY="3c41b4f538e9511b898fb1f23e51b7706bd57bdf" && export PYTHONPATH=$(pwd)
 
 
-python ./src/main_lora.py --dataset wikitext --dataset_name wikitext --num_clients 3 --num_classes 10 -le 100 --wandb --wandb_project "FL-LLM-Lora" -expn "basic_test" --use_pretrained gpt2 --lora_causal_self_attention --lora_freeze_all_non_lora 
+python ./src/main_lora.py --dataset wikitext --dataset_name wikitext --num_clients 2 --num_classes 10 -le 1 --wandb --wandb_project "FL-LLM-Lora" -expn "basic_test" --use_pretrained gpt2 --lora_causal_self_attention --lora_freeze_all_non_lora 

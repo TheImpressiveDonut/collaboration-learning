@@ -113,7 +113,7 @@ class TrainerLoRA(object):
         for client in self.clients.values():
             for name, param in client.model.named_parameters():
                 if param.requires_grad:
-                    print(f'{name}')
+                    print(f'{name}, {param}')
                     if name in gradients:
                         gradients[name] += param.grad.clone()
                     else:
