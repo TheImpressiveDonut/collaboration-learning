@@ -53,6 +53,16 @@ class ClientLoRA(object):
         self.batch_size = args.batch_size
         self.type_ctx = torch.amp.autocast(device_type='cuda', dtype=torch.bfloat16)  # extra_args.dtype)
 
+    def global_grad_update(self, grad):
+        self.model.train()
+
+        for name, param in self.model.named_parameters():
+            if param.requires_grad:
+                param.weight.grad = grad[name]
+
+        self.optimizer.step()
+        self.optimizer.zero_grad(set_to_none=True)
+
 
     def train(self) -> None:
         self.model.train()

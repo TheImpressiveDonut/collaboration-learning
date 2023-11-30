@@ -103,5 +103,21 @@ class TrainerLoRA(object):
             self.val_pps[current_global_epoch].append(val_perplexity)
             self.val_accs[current_global_epoch].append(val_acc)
 
+        self.__average_update()
+
     def __local_epoch(self, client: ClientLoRA):
         client.train()
+
+    def __average_update(self):
+        gradients = {}
+        for client in self.clients.values():
+            for name, param in client.model.named_parameters():
+                if param.requires_grad:
+                    if name in gradients:
+                        gradients[name] += param.grad.clone()
+                    else:
+                        gradients[name] += param.grad.clone()
+
+        for name in gradients.keys():
+            gradients[name] /= len(self.clients.keys())
+

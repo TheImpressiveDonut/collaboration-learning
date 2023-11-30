@@ -20,4 +20,4 @@ conda env create -f collabllm.yml
 conda activate collabllm && export WANDB_API_KEY="3c41b4f538e9511b898fb1f23e51b7706bd57bdf" && export PYTHONPATH=$(pwd)
 
 
-python ./src/main_lora.py --dataset wikitext --dataset_name wikitext --num_clients 10 --num_classes 10 --wandb --wandb_project "FL-LLM-Lora" -expn "basic_test" --use_pretrained gpt2 --lora_causal_self_attention --lora_freeze_all_non_lora 
+python ./src/main_lora.py --dataset wikitext --dataset_name wikitext --num_clients 3 --num_classes 10 -le 100 --wandb --wandb_project "FL-LLM-Lora" -expn "basic_test" --use_pretrained gpt2 --lora_causal_self_attention --lora_freeze_all_non_lora 
