@@ -116,7 +116,7 @@ class TrainerLoRA(object):
                     if name in gradients:
                         gradients[name] += param.grad.clone()
                     else:
-                        gradients[name] += param.grad.clone()
+                        gradients[name] = param.grad.clone()
 
         for name in gradients.keys():
             gradients[name] /= len(self.clients.keys())
