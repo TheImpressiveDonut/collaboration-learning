@@ -3,3 +3,6 @@ gen_dataset/data/*
 **/__pycache__/
 gen_dataset/helpers/FLamby/*
 gen_dataset/helpers/script_helper.py
+cmd.md
+wandb/
+src/lora_model/src/data/datasets/
