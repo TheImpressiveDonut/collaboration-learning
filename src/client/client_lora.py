@@ -55,17 +55,18 @@ class ClientLoRA(object):
 
     def global_grad_update(self, grad):
         self.model.train()
+        self.optimizer.zero_grad(set_to_none=True)
 
         for name, param in self.model.named_parameters():
             if param.requires_grad:
                 param.weight.grad = grad[name]
 
         self.optimizer.step()
-        self.optimizer.zero_grad(set_to_none=True)
 
 
     def train(self) -> None:
         self.model.train()
+        self.optimizer.zero_grad(set_to_none=True)
 
         for microstep_idx in range(self.acc_steps):  # gradient accumulation
             x, y = get_batch(self.train_data, self.sequence_length, self.batch_size, device=self.device)
@@ -82,7 +83,6 @@ class ClientLoRA(object):
             torch.nn.utils.clip_grad_norm_(self.model.parameters(), self.grad_clip)
         self.optimizer.step()
         self.scheduler.step()
-        self.optimizer.zero_grad(set_to_none=True)
 
 
     def val(self) -> Tuple[float, float, float]:
