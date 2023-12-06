@@ -4,8 +4,8 @@ from typing import List, Tuple
 import numpy as np
 from sklearn.model_selection import train_test_split
 
-from src.utils.exceptions import UnknownPartitionArgumentException, UnknownSplitDataModeException
-from src.utils.types import ClientsData, Data, ClientsDataStatistics
+from .exceptions import UnknownPartitionArgumentException, UnknownSplitDataModeException
+from .types import ClientsData, Data, ClientsDataStatistics
 
 
 def __get_pat_partition(dataset_label: np.ndarray, args: Namespace) -> List[np.ndarray]:
@@ -68,20 +68,22 @@ def __get_dir_partition(dataset_label: np.ndarray, args: Namespace) -> List[np.n
 
 def clients_split(data: Data, args: Namespace) -> Tuple[ClientsData, ClientsDataStatistics]:
     clients_data, statistic = [], []
-    dataset_image, dataset_label = data
+    dataset_X, dataset_y = data
 
     match args.partition:
         case 'pat':
-            data_idx_map = __get_pat_partition(dataset_label, args)
+            data_idx_map = __get_pat_partition(dataset_y, args)
         case 'dir':
-            data_idx_map = __get_dir_partition(dataset_label, args)
+            data_idx_map = __get_dir_partition(dataset_y, args)
         case _:
             raise UnknownPartitionArgumentException(args.partition)
+
+
 
     # assign data
     for client in range(args.num_clients):
         idxs = data_idx_map[client]
-        clients_data.append((dataset_image[idxs], dataset_label[idxs]))
+        clients_data.append((dataset_X[idxs], dataset_y[idxs]))
 
         statistic.append([])
         vals, counts = np.unique(clients_data[client][1], return_counts=True)

@@ -8,7 +8,6 @@ https://github.com/huggingface/transformers/blob/main/src/transformers/models/gp
 """
 
 import math
-import inspect
 from argparse import Namespace
 
 import tiktoken
@@ -261,7 +260,7 @@ class Block(nn.Module):
 
 class GPTLoRA(nn.Module):
 
-    def __init__(self, config):
+    def __init__(self, config: Namespace, verbose: bool = False):
         super().__init__()
         assert config.vocab_size is not None
         assert config.sequence_length is not None
@@ -271,11 +270,9 @@ class GPTLoRA(nn.Module):
         if config.lora_embedding:
             wte = LoRAEmbedding(config.vocab_size, config.n_embd,
                                 lora_rank=config.lora_rank, lora_alpha=config.lora_alpha)
-            wpe = LoRAEmbedding(config.sequence_length, config.n_embd,
-                                lora_rank=config.lora_rank, lora_alpha=config.lora_alpha)
         else:
             wte = nn.Embedding(config.vocab_size, config.n_embd)
-            wpe = nn.Embedding(config.sequence_length, config.n_embd)
+        wpe = nn.Embedding(config.sequence_length, config.n_embd)
 
         self.transformer = nn.ModuleDict(dict(
             wte=wte,
@@ -300,18 +297,20 @@ class GPTLoRA(nn.Module):
                 torch.nn.init.normal_(p, mean=0.0, std=0.02 / math.sqrt(2 * config.n_layer))
 
         # report number of parameters, excluding lora
-        print("number of parameters: %.2fM" % (self.get_num_params() / 1e6,))
-        print("number of trainable parameters: %.2fM" % (self.get_num_params(only_trainable=True) / 1e6,))
+        if verbose:
+            print("number of parameters: %.2fM" % (self.get_num_params() / 1e6,))
+            print("number of trainable parameters: %.2fM" % (self.get_num_params(only_trainable=True) / 1e6,))
 
         # turn on lora weights and off linear weights
         lora_model(self, lora_freeze_all_non_lora=config.lora_freeze_all_non_lora)
 
         # report number of parameters, with lora
-        print("number of parameters with lora: %.2fM" % (self.get_num_params(lora_params=True) / 1e6,))
-        print("number of trainable parameters with lora: %.2fM" % (
-            self.get_num_params(lora_params=True, only_trainable=True) / 1e6,))
-        print("number of trainable parameters with lora and embedding: %.2fM" % (
-            self.get_num_params(non_embedding=False, lora_params=True, only_trainable=True) / 1e6,))
+        if verbose:
+            print("number of parameters with lora: %.2fM" % (self.get_num_params(lora_params=True) / 1e6,))
+            print("number of trainable parameters with lora: %.2fM" % (
+                self.get_num_params(lora_params=True, only_trainable=True) / 1e6,))
+            print("number of trainable parameters with lora and embedding: %.2fM" % (
+                self.get_num_params(non_embedding=False, lora_params=True, only_trainable=True) / 1e6,))
 
     def get_num_params(self, non_embedding=True, lora_params=False, only_trainable=False):
         """
@@ -343,10 +342,11 @@ class GPTLoRA(nn.Module):
                 self.named_parameters())
 
         if non_embedding:
-            if lora_params and isinstance(self.transformer.wte, LoRAEmbedding):
-                params = [self.transformer.wte.lora_A, self.transformer.wte.lora_B,
-                          self.transformer.wpe.lora_A, self.transformer.wpe.lora_B]
-                n_params -= sum(p.numel() if not (only_trainable and not p.requires_grad) else 0 for p in params)
+            if lora_params:
+                if isinstance(self.transformer.wte, LoRAEmbedding):
+                    params = [self.transformer.wte.lora_A, self.transformer.wte.lora_B,
+                              self.transformer.wpe.lora_A, self.transformer.wpe.lora_B]
+                    n_params -= sum(p.numel() if not (only_trainable and not p.requires_grad) else 0 for p in params)
             else:
                 n_params -= self.transformer.wte.weight.numel()
                 n_params -= self.transformer.wpe.weight.numel()
@@ -396,7 +396,7 @@ class GPTLoRA(nn.Module):
             block.attn.bias = block.attn.bias[:, :, :sequence_length, :sequence_length]
 
     @classmethod
-    def from_pretrained(cls, model_type, override_args=None):
+    def from_pretrained(cls, model_type: str, override_args: Namespace = None, verbose: bool = False):
         model_hf = GPT2LMHeadModel.from_pretrained(model_type)
         sd_hf = model_hf.state_dict()
 
@@ -424,7 +424,7 @@ class GPTLoRA(nn.Module):
         config_args['lora_freeze_all_non_lora'] = override_args.lora_freeze_all_non_lora
 
         args = Namespace(**config_args)
-        model = GPTLoRA(args)
+        model = GPTLoRA(args, verbose=verbose)
 
         for name, param in model.named_parameters():
             if 'lora' in name:

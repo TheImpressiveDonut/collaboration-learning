@@ -3,12 +3,10 @@ import pickle
 from argparse import Namespace
 from typing import Any
 
-import torch
 import ujson
 
-from src.utils.folders import get_config_path, get_save_train_test_ref_path, __create_folder
-from src.utils.mlo_folders import get_mlo_dir_res_path
-from src.utils.types import ClientsData, Dataset
+from .folders import get_config_path, get_save_train_test_ref_path
+from .types import ClientsData, Dataset
 
 
 def __load_config(path: str) -> Any:
@@ -43,10 +41,3 @@ def save_dataset(train_data: ClientsData, test_data: ClientsData, ref_data: Clie
     __save_data(ref_data, ref_path)
     __save_config(args, get_config_path(args))
 
-
-def save_results(trust_weights, test_accuracies, ref_accuracies, dataset_name: str, experiment_name: str) -> None:
-    path = f'{get_mlo_dir_res_path()}{dataset_name}/{experiment_name}/'
-    __create_folder(path)
-    torch.save(trust_weights, f'{path}trust.pt')
-    torch.save(test_accuracies, f'{path}test.pt')
-    torch.save(ref_accuracies, f'{path}ref.pt')

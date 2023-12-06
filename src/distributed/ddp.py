@@ -1,9 +1,9 @@
-import os
 import math
+import os
 from contextlib import contextmanager
 
-from torch.nn.parallel import DistributedDataParallel as DDP
 from torch.distributed import init_process_group, destroy_process_group, get_world_size
+from torch.nn.parallel import DistributedDataParallel as DDP
 
 from .backend import DistributedBackend
 
@@ -37,7 +37,7 @@ class DataParallelDistributedBackend(DistributedBackend):
     @contextmanager
     def get_context_for_microstep_forward(self, model, microstep_idx, gradient_accumulation_steps):
         model.require_backward_grad_sync = (
-            microstep_idx == gradient_accumulation_steps - 1)
+                microstep_idx == gradient_accumulation_steps - 1)
         yield
 
     def is_master_process(self) -> bool:

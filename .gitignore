@@ -5,4 +5,4 @@ gen_dataset/helpers/FLamby/*
 gen_dataset/helpers/script_helper.py
 cmd.md
 wandb/
-src/lora_model/src/data/datasets/
+src/data/datasets/

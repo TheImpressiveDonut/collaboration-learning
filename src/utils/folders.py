@@ -2,8 +2,8 @@ import os
 from argparse import Namespace
 from typing import Tuple
 
-from src.utils.mlo_folders import get_mlo_dir_dataset_path
-from src.utils.types import DatasetName
+from .mlo_folders import get_mlo_dir_dataset_path
+from .types import DatasetName
 
 
 def __create_folder(dir_path: str) -> None:
@@ -12,7 +12,7 @@ def __create_folder(dir_path: str) -> None:
 
 
 def __get_dataset_path(dataset_name: DatasetName) -> True:
-    return f'{get_mlo_dir_dataset_path()}{dataset_name}/'
+    return f'{get_mlo_dir_dataset_path()}data/{dataset_name}/'
 
 
 def __get_path_new_dir(dataset_name: DatasetName, dir: str, create_dir: bool = True) -> str:
@@ -23,7 +23,7 @@ def __get_path_new_dir(dataset_name: DatasetName, dir: str, create_dir: bool = T
 
 
 def __get_save_path(args: Namespace, create_dir: bool = True) -> str:
-    return __get_path_new_dir(args.dataset_name, f'save/{args.__repr__()}/', create_dir)
+    return __get_path_new_dir(args.dataset_name, args.__repr__(), create_dir)
 
 
 def get_config_path(args: Namespace) -> str:
