@@ -412,7 +412,7 @@ class GPTLoRA(nn.Module):
         }[model_type]
 
         config_args['vocab_size'] = 50257  # always 50257 for GPT model checkpoints
-        config_args['sequence_length'] = 1024  # always 1024 for GPT model checkpoints
+        config_args['sequence_length'] = 512  # always 1024 for GPT model checkpoints
         config_args['bias'] = True  # always True for GPT model checkpoints
         config_args['dropout'] = 0.2
         config_args['lora_rank'] = override_args.lora_rank
