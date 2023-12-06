@@ -43,6 +43,7 @@ def main(args: Namespace, dataset: Tuple[List[np.ndarray], List[np.ndarray]]) ->
         distributed_backend = distributed.make_backend_from_args(args)
         args_db = distributed_backend.get_adjusted_args_for_process(args)
         model = GPTLoRA.from_pretrained(args.use_pretrained, args_db, verbose=(id == 0)).to(args_db.device)
+        model.crop_sequence_length(512)
         model = distributed_backend.transform_model(model)
 
         group_specs = distributed_backend.get_raw_model(model).get_parameter_group_specs()
