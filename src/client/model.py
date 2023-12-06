@@ -392,8 +392,8 @@ class GPTLoRA(nn.Module):
         assert sequence_length <= self.config.sequence_length
         self.config.sequence_length = sequence_length
         self.transformer.wpe.weight = nn.Parameter(self.transformer.wpe.weight[:sequence_length])
-        for block in self.transformer.h:
-            block.attn.bias = block.attn.bias[:, :, :sequence_length, :sequence_length]
+        # for block in self.transformer.h:
+            # block.attn.bias = block.attn.bias[:, :, :sequence_length, :sequence_length]
 
     @classmethod
     def from_pretrained(cls, model_type: str, override_args: Namespace = None, verbose: bool = False):
