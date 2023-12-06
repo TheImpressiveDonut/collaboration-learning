@@ -18,6 +18,7 @@ def __get_pat_partition(dataset_label: np.ndarray, args: Namespace) -> List[np.n
 
     for i in range(args.num_classes):
         selected_clients = np.argwhere(class_num_per_client > 0).flatten()
+        np.random.shuffle(selected_clients)
         selected_clients = selected_clients[:int(args.num_clients / args.num_classes * args.class_per_client)]
 
         num_all_samples = idx_for_each_class[i].shape[0]
@@ -25,16 +26,18 @@ def __get_pat_partition(dataset_label: np.ndarray, args: Namespace) -> List[np.n
         num_sample_per_clients = int(num_all_samples / num_selected_clients)
 
         if args.balance:
-            idxs = np.array_split(idx_for_each_class[i], num_sample_per_clients)
+            idxs = np.array_split(idx_for_each_class[i], num_selected_clients)
         else:
             num_samples = np.random.randint(
                 int(max(num_sample_per_clients / 10, least_samples / args.num_classes)),
                 num_sample_per_clients, num_selected_clients, dtype=int)
             idxs = np.split(idx_for_each_class[i], np.cumsum(num_samples[:-1]))
 
+        i = 0
         for client in selected_clients:
-            data_idx_map[client] = np.concatenate((data_idx_map[client], idxs[client]))
+            data_idx_map[client] = np.concatenate((data_idx_map[client], idxs[i]))
             class_num_per_client[client] -= 1
+            i += 1
 
     return data_idx_map
 

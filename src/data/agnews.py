@@ -31,7 +31,7 @@ def get_agnews_data(args: Namespace) -> Tuple[List[np.ndarray], List[np.ndarray]
     dataset_text = np.array(dataset_text)
     dataset_label = np.array(dataset_label)
 
-    clients_data, statistic = clients_split((dataset_text, dataset_label), args)
+    clients_data, statistic = clients_split((dataset_text, dataset_label - 1), args)
     train_data, test_data, _ = train_test_ref_split(clients_data, args)
 
     tokenizer = tiktoken.get_encoding('gpt2')

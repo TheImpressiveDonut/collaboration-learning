@@ -2,8 +2,9 @@ from argparse import Namespace
 from typing import Dict
 
 import numpy as np
+import torch
+import torch.functional as F
 import wandb
-from torch import Tensor
 from tqdm import tqdm
 
 from client.client import Client
@@ -96,19 +97,18 @@ class Trainer(object):
         if current_global_epoch > self.pretraining_rounds and (current_global_epoch % self.trust_freq) == 0:
             match self.trust:
                 case TrustName.static:
-                    gradients = None
+                    pass
                 case TrustName.naive:
-                    gradients = self.__average_gradients()
+                    self.__average_gradients()
+                case TrustName.dynamic:
+                    self.__similarity_gradients()
                 case _:
                     raise UnknownNameCustomEnumException(self.trust, TrustName)
-
-            for _, clients in self.clients.items():
-                clients.manual_grad_update(gradients)
 
     def __local_epoch(self, client: Client, acc_steps: int):
         client.train(acc_steps=acc_steps)
 
-    def __average_gradients(self) -> Dict[str, Tensor]:
+    def __average_gradients(self) -> None:
         gradients = {}
         for client in self.clients.values():
             for name, param in client.model.named_parameters():
@@ -121,4 +121,50 @@ class Trainer(object):
         for name in gradients.keys():
             gradients[name] /= len(self.clients.keys())
 
-        return gradients
+        for _, clients in self.clients.items():
+            clients.manual_grad_update(gradients)
+
+    def __similarity_gradients(self) -> None:
+        gradients = {}
+        for id, client in self.clients.items():
+            for name, param in client.model.named_parameters():
+                if param.requires_grad:
+                    if name in gradients:
+                        gradients[name][id] = param.grad.clone()
+                    else:
+                        gradients[name] = {}
+                        gradients[name][id] = param.grad.clone()
+
+        trust_weight = torch.zeros((len(self.clients), len(self.clients)))
+        trust_weight.fill_diagonal_(1)
+        for id_1 in self.clients.values():
+            for id_2 in self.clients.values():
+                if id_1 > id_2 or id_1 == id_2:
+                    pass
+
+                score = 0
+
+                for name in gradients.values():
+                    cos = torch.cosine_similarity(gradients[name][id_1], gradients[name][id_2])
+                    score += torch.sum(cos).item()
+
+                trust_weight[id_1, id_2] = score
+                trust_weight[id_2, id_1] = score
+
+        trust_weight = torch.softmax(trust_weight, dim=1)
+
+        for id, client in self.clients.items():
+            gradients_id = {}
+
+            for name in gradients.values():
+                for p_id, p in gradients[name].items():
+                    if name in gradients:
+                        gradients[name] = p.grad.clone() * trust_weight[id, p_id].item()
+                    else:
+                        gradients[name] += p.grad.clone() * trust_weight[id, p_id].item()
+
+            client.manual_grad_update(gradients_id)
+
+
+
+

@@ -19,7 +19,8 @@ def get_dataset(args: Namespace) -> Tuple[List[np.ndarray], List[np.ndarray]]:
         'partition': args.partition,
         'batch_size': args.batch_size,
         'train_size': 0.8,
-        'ref': args.ref
+        'ref': args.ref,
+        'class_per_client': args.class_per_client
     }
     config = Namespace(**config)
 
