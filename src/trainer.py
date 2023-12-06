@@ -57,16 +57,16 @@ class Trainer(object):
                     'global_ref_accuracy': val_loss
                 }
 
-                for idx, acc in enumerate(self.train_losses[current_global_epoch // self.eval_freq]):
+                for idx, acc in enumerate(self.train_losses[(current_global_epoch // self.eval_freq) - 1]):
                     wandb_dict[f'{idx}_train_loss'] = acc
 
-                for idx, acc in enumerate(self.val_losses[current_global_epoch // self.eval_freq]):
+                for idx, acc in enumerate(self.val_losses[(current_global_epoch // self.eval_freq) - 1]):
                     wandb_dict[f'{idx}_val_loss'] = acc
 
-                for idx, acc in enumerate(self.val_pps[current_global_epoch // self.eval_freq]):
+                for idx, acc in enumerate(self.val_pps[(current_global_epoch // self.eval_freq) - 1]):
                     wandb_dict[f'{idx}_val_pp'] = acc
 
-                for idx, acc in enumerate(self.val_accs[current_global_epoch // self.eval_freq]):
+                for idx, acc in enumerate(self.val_accs[(current_global_epoch // self.eval_freq) - 1]):
                     wandb_dict[f'{idx}_val_acc'] = acc
 
                 wandb.log(wandb_dict)
@@ -87,10 +87,10 @@ class Trainer(object):
             if current_global_epoch % self.eval_freq == 0:
                 val_acc, val_loss, val_perplexity = client.val()
                 train_loss = client.loss.detach().cpu().item()
-                self.train_losses[current_global_epoch // self.eval_freq].append(train_loss)
-                self.val_losses[current_global_epoch // self.eval_freq].append(val_loss)
-                self.val_pps[current_global_epoch // self.eval_freq].append(val_perplexity)
-                self.val_accs[current_global_epoch // self.eval_freq].append(val_acc)
+                self.train_losses[(current_global_epoch // self.eval_freq) - 1].append(train_loss)
+                self.val_losses[(current_global_epoch // self.eval_freq) - 1].append(val_loss)
+                self.val_pps[(current_global_epoch // self.eval_freq) - 1].append(val_perplexity)
+                self.val_accs[(current_global_epoch // self.eval_freq) - 1].append(val_acc)
 
         # trust update
         if current_global_epoch > self.pretraining_rounds and (current_global_epoch % self.trust_freq) == 0:
