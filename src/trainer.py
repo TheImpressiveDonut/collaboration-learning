@@ -43,8 +43,8 @@ class Trainer(object):
 
             if current_global_epoch % self.eval_freq == 0:
 
-                train_loss = np.mean(self.train_losses[current_global_epoch])
-                val_loss = np.mean(self.val_losses[current_global_epoch])
+                train_loss = np.mean(self.train_losses[(current_global_epoch // self.eval_freq) - 1])
+                val_loss = np.mean(self.val_losses[(current_global_epoch // self.eval_freq) - 1])
 
                 global_epochs.set_description(
                     f'global epochs (local accuracy: {train_loss:.5f}[{train_loss - prev_train_loss:+.5f}]'
