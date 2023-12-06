@@ -13,6 +13,7 @@ ClientsDataStatistics = List[DataStatistics]
 class TrustName(StrEnum):
     static = auto()
     naive = auto()
+    dynamic = auto()
 
 
 class ModeName(StrEnum):

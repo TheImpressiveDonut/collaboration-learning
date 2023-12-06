@@ -31,6 +31,7 @@ class Client(object):
         print(f"Compiling {id} client's model")
         self.model = typing.cast(GPTLoRA, torch.compile(model, dynamic=True))
 
+        self.loss = None
         self.trust = args.trust
         self.lambda_ = args.lambda_
         self.grad_clip = args.grad_clip
@@ -50,6 +51,7 @@ class Client(object):
                     outputs = self.model(x, targets=y)
 
             loss = outputs['loss'] / acc_steps
+            self.loss = loss * acc_steps
             loss.backward()
 
         if self.grad_clip != 0.0:
