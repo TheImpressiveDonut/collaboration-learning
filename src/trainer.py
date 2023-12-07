@@ -163,9 +163,4 @@ class Trainer(object):
                     else:
                         gradients_id[name] = p * trust_weight[id, p_id].item()
 
-
             client.manual_grad_update(gradients_id)
-
-
-
-

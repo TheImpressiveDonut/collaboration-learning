@@ -75,6 +75,6 @@ class Client(object):
 
         for name, param in self.model.named_parameters():
             if param.requires_grad:
-                param.weight.grad = gradients[name]
+                param.grad = gradients[name]
 
         self.optimizer.step()
