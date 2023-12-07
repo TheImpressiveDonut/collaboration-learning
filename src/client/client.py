@@ -70,12 +70,11 @@ class Client(object):
             raise NotImplementedError
 
     def manual_grad_update(self, gradients: Dict[str, Tensor]):
-        if not gradients is None:
-            self.model.train()
-            self.optimizer.zero_grad(set_to_none=True)
+        self.model.train()
+        self.optimizer.zero_grad(set_to_none=True)
 
-            for name, param in self.model.named_parameters():
-                if param.requires_grad:
-                    param.weight.grad = gradients[name]
+        for name, param in self.model.named_parameters():
+            if param.requires_grad:
+                param.weight.grad = gradients[name]
 
-            self.optimizer.step()
+        self.optimizer.step()

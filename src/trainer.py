@@ -153,6 +153,8 @@ class Trainer(object):
 
         trust_weight = torch.softmax(trust_weight, dim=1)
 
+        print(gradients.keys())
+
         for id, client in self.clients.items():
             gradients_id = {}
 
