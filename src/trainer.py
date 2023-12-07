@@ -153,17 +153,15 @@ class Trainer(object):
 
         trust_weight = torch.softmax(trust_weight, dim=1)
 
-        print(gradients.keys())
-
         for id, client in self.clients.items():
             gradients_id = {}
 
             for name in gradients.keys():
                 for p_id, p in gradients[name].items():
-                    if name in gradients:
-                        gradients[name] = p * trust_weight[id, p_id].item()
+                    if name in gradients_id:
+                        gradients_id[name] = p * trust_weight[id, p_id].item()
                     else:
-                        gradients[name] += p * trust_weight[id, p_id].item()
+                        gradients_id[name] += p * trust_weight[id, p_id].item()
 
 
             client.manual_grad_update(gradients_id)
