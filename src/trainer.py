@@ -137,8 +137,8 @@ class Trainer(object):
 
         trust_weight = torch.zeros((len(self.clients), len(self.clients)))
         trust_weight.fill_diagonal_(1)
-        for id_1 in self.clients.values():
-            for id_2 in self.clients.values():
+        for id_1 in self.clients.keys():
+            for id_2 in self.clients.keys():
                 if id_1 > id_2 or id_1 == id_2:
                     pass
 
@@ -162,6 +162,7 @@ class Trainer(object):
                         gradients[name] = p.grad.clone() * trust_weight[id, p_id].item()
                     else:
                         gradients[name] += p.grad.clone() * trust_weight[id, p_id].item()
+
 
             client.manual_grad_update(gradients_id)
 
