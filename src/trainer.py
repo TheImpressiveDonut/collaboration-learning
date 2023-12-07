@@ -144,7 +144,7 @@ class Trainer(object):
 
                 score = 0
 
-                for name in gradients.values():
+                for name in gradients.keys():
                     cos = torch.cosine_similarity(gradients[name][id_1], gradients[name][id_2])
                     score += torch.sum(cos).item()
 
@@ -156,7 +156,7 @@ class Trainer(object):
         for id, client in self.clients.items():
             gradients_id = {}
 
-            for name in gradients.values():
+            for name in gradients.keys():
                 for p_id, p in gradients[name].items():
                     if name in gradients:
                         gradients[name] = p.grad.clone() * trust_weight[id, p_id].item()
