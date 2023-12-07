@@ -159,9 +159,9 @@ class Trainer(object):
             for name in gradients.keys():
                 for p_id, p in gradients[name].items():
                     if name in gradients_id:
-                        gradients_id[name] = p * trust_weight[id, p_id].item()
-                    else:
                         gradients_id[name] += p * trust_weight[id, p_id].item()
+                    else:
+                        gradients_id[name] = p * trust_weight[id, p_id].item()
 
 
             client.manual_grad_update(gradients_id)
