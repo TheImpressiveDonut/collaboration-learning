@@ -11,15 +11,16 @@ def get_args() -> Namespace:
     parser.add_argument('--experiment_name', type=str, required=True)
     parser.add_argument('--seed', default=1, type=int)
     parser.add_argument('--dataset', type=str, required=True)
+    parser.add_argument('--debug', action='store_true')
     parser.add_argument('--wandb', action='store_true')
     parser.add_argument('--wandb_project', type=str, default='none')
     parser.add_argument('--use_pretrained', default='gpt2', type=str)
 
     parser.add_argument('--num_clients', required=True, type=int)
     parser.add_argument('--num_classes', required=True, type=int)
-    parser.add_argument('--num_global_rounds', default=2000, type=int)
-    parser.add_argument('--acc_steps', default=4, type=int)
-    parser.add_argument('--pretraining_rounds', default=200, type=int)
+    parser.add_argument('--num_global_rounds', default=50, type=int)
+    parser.add_argument('--acc_steps', default=200, type=int)
+    parser.add_argument('--pretraining_rounds', default=10, type=int)
     parser.add_argument('--eval_freq', default=200, type=int)
 
     parser.add_argument('--batch_size', default=50, type=int)
@@ -27,10 +28,9 @@ def get_args() -> Namespace:
     parser.add_argument('--lambda_', default=0.5, type=float)
     parser.add_argument('--sequence_length', default=512, type=int)
     parser.add_argument('--trust', type=str, help='none, dynamic, naive')
-    parser.add_argument('--trust_freq', type=int, default=50)
 
     ##lora config
-    parser.add_argument('--warmup_percent', default=0.02, type=float)
+    parser.add_argument('--warmup_percent', default=0.04, type=float)
     parser.add_argument('--weight_decay', default=1e-3, type=float)
     parser.add_argument('--beta1', default=0.9, type=float)
     parser.add_argument('--beta2', default=0.95, type=float)

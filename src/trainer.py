@@ -2,8 +2,8 @@ from argparse import Namespace
 from typing import Dict
 
 import numpy as np
+import seaborn as sns
 import torch
-import torch.functional as F
 import wandb
 from tqdm import tqdm
 
@@ -20,7 +20,6 @@ class Trainer(object):
         self.pretraining_rounds = args.pretraining_rounds
         self.acc_steps = args.acc_steps
         self.trust = args.trust
-        self.trust_freq = args.trust_freq
         self.eval_freq = args.eval_freq
 
         self.train_losses = []
@@ -94,7 +93,7 @@ class Trainer(object):
                 self.val_accs[(current_global_epoch // self.eval_freq) - 1].append(val_acc)
 
         # trust update
-        if current_global_epoch > self.pretraining_rounds and (current_global_epoch % self.trust_freq) == 0:
+        if current_global_epoch > self.pretraining_rounds:
             match self.trust:
                 case TrustName.none:
                     pass
@@ -136,24 +135,21 @@ class Trainer(object):
                         gradients[name][id] = param.grad.clone()
 
         trust_weight = torch.zeros((len(self.clients), len(self.clients)))
-        trust_weight.fill_diagonal_(1)
         for id_1 in self.clients.keys():
             for id_2 in self.clients.keys():
-                if id_1 > id_2 or id_1 == id_2:
-                    pass
+                if id_2 <= id_1:
+                    score = 0
 
-                score = 0
+                    for name in gradients.keys():
+                        cos = torch.cosine_similarity(gradients[name][id_1], gradients[name][id_2])
+                        score += torch.mean(cos).item()
 
-                for name in gradients.keys():
-                    cos = torch.cosine_similarity(gradients[name][id_1], gradients[name][id_2])
-                    score += torch.sum(cos).item()
-
-                trust_weight[id_1, id_2] = score
-                trust_weight[id_2, id_1] = score
+                    trust_weight[id_1, id_2] = score / len(gradients.keys())
+                    trust_weight[id_2, id_1] = score / len(gradients.keys())
 
         trust_weight = torch.softmax(trust_weight, dim=1)
-        trust_table = wandb.Table(columns=list(map(lambda x: str(x), range(len(self.clients)))), data=trust_weight.numpy())
-        wandb.log({'Trust weights': trust_table})
+        fig = sns.heatmap(trust_weight.numpy())
+        wandb.log({'Trust weights': wandb.Image(fig)})
 
         for id, client in self.clients.items():
             gradients_id = {}

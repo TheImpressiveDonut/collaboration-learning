@@ -99,7 +99,7 @@ def main(args: Namespace, dataset: Tuple[List[np.ndarray], List[np.ndarray]], st
                     pct_start=args_db.warmup_percent,
                     anneal_strategy=args_db.scheduler,
                     cycle_momentum=False, div_factor=1e2,
-                    final_div_factor=.05
+                    final_div_factor=1e4
                 )
             else:
                 raise NotImplementedError(f"Unknown scheduler type: {args_db.scheduler}.")
@@ -123,6 +123,11 @@ if __name__ == '__main__':
     args = get_args()
 
     train_data, val_data, stats = get_dataset(args)
+
+    if args.debug:
+        args.sequence_length = 32
+        args.batch_size = 4
+        args.acc_steps = 2
 
     print(f'Total number of train samples: {sum([len(a) for a in train_data])}')
     print(f'Total number of validation samples: {sum([len(a) for a in val_data])}')
