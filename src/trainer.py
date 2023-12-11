@@ -1,6 +1,7 @@
 from argparse import Namespace
 from typing import Dict
 
+import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
 import torch
@@ -26,6 +27,8 @@ class Trainer(object):
         self.val_losses = []
         self.val_pps = []
         self.val_accs = []
+
+        self.trust_weights = []
 
     def train(self, global_epochs: int):
         global_epochs = tqdm(range(1, global_epochs + 1), position=0, leave=False, desc='global epochs')
@@ -148,8 +151,12 @@ class Trainer(object):
                     trust_weight[id_2, id_1] = score / len(gradients.keys())
 
         trust_weight = torch.softmax(trust_weight, dim=1)
-        fig = sns.heatmap(trust_weight.numpy())
-        wandb.log({'Trust weights': wandb.Image(fig)})
+        plot = sns.heatmap(trust_weight.numpy(), annot=True, fmt='.3f')
+
+        self.trust_weights.append(wandb.Image(plot.get_figure()))
+        plt.cla()
+        plt.clf()
+        wandb.log({'Trust weights': self.trust_weights})
 
         for id, client in self.clients.items():
             gradients_id = {}

@@ -125,7 +125,7 @@ if __name__ == '__main__':
     train_data, val_data, stats = get_dataset(args)
 
     if args.debug:
-        args.sequence_length = 32
+        args.sequence_length = 8
         args.batch_size = 4
         args.acc_steps = 2
 
