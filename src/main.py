@@ -124,6 +124,8 @@ if __name__ == '__main__':
 
     train_data, val_data, stats = get_dataset(args)
 
+    print(f'Total number of train samples: {sum([len(a) for a in train_data])}')
+    print(f'Total number of validation samples: {sum([len(a) for a in val_data])}')
     print(f'Num training tokens: {[len(a) for a in train_data]}')
     print(f'Num validation tokens: {[len(a) for a in val_data]}')
     for client in range(args.num_clients):

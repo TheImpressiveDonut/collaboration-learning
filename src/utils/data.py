@@ -94,10 +94,6 @@ def clients_split(data: Data, args: Namespace) -> Tuple[ClientsData, ClientsData
     return clients_data, statistic
 
 
-def __get_num_samples(data: ClientsData) -> int:
-    return sum(map(lambda x: x[1].shape[0], data))
-
-
 def train_test_ref_split(clients_data: ClientsData, args: Namespace, mode: str = 'by-ratio'
                          ) -> Tuple[ClientsData, ClientsData, ClientsData]:
     train_data, test_data, ref_data = [], [], []
@@ -125,13 +121,5 @@ def train_test_ref_split(clients_data: ClientsData, args: Namespace, mode: str =
 
         train_data.append((X_train, y_train))
         test_data.append((X_test, y_test))
-
-    train_num, test_num, ref_num = __get_num_samples(train_data), __get_num_samples(test_data), __get_num_samples(
-        ref_data)
-    print('Total number of samples: ', train_num + test_num + ref_num)
-    print('The number of train samples: ', train_num)
-    print('The number of test_folder samples: ', test_num)
-    if args.ref:
-        print('The number of ref samples:', ref_num)
 
     return train_data, test_data, ref_data
