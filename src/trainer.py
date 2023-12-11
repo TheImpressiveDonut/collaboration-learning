@@ -96,7 +96,7 @@ class Trainer(object):
         # trust update
         if current_global_epoch > self.pretraining_rounds and (current_global_epoch % self.trust_freq) == 0:
             match self.trust:
-                case TrustName.static:
+                case TrustName.none:
                     pass
                 case TrustName.naive:
                     self.__average_gradients()
@@ -152,6 +152,8 @@ class Trainer(object):
                 trust_weight[id_2, id_1] = score
 
         trust_weight = torch.softmax(trust_weight, dim=1)
+        trust_table = wandb.Table(columns=list(map(lambda x: str(x), range(len(self.clients)))), data=trust_weight.numpy())
+        wandb.log({'Trust weights': trust_table})
 
         for id, client in self.clients.items():
             gradients_id = {}

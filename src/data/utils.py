@@ -3,12 +3,12 @@ from typing import Tuple, List
 
 import numpy as np
 from utils.exceptions import UnknownNameCustomEnumException
-from utils.types import DatasetName
+from utils.types import DatasetName, ClientsDataStatistics
 
 from .agnews import get_agnews_data
 
 
-def get_dataset(args: Namespace) -> Tuple[List[np.ndarray], List[np.ndarray]]:
+def get_dataset(args: Namespace) -> Tuple[List[np.ndarray], List[np.ndarray], ClientsDataStatistics]:
     config = {
         'dataset_name': args.dataset,
         'num_clients': args.num_clients,

@@ -9,12 +9,6 @@ cd /mlodata1/nwagner/personalized-collaboration-learning/ && git pull
 conda env create -f collabllm.yml
 conda activate collabllm && export WANDB_API_KEY="3c41b4f538e9511b898fb1f23e51b7706bd57bdf"
 
-
-python  -W ignore ./src/main.py --experiment_name "agnews_self_mlp" --wandb --wandb_project "FL-LLM-Lora" --dataset agnews --pretraining_rounds 200 --use_pretrained gpt2 --trust static --lora_causal_self_attention --lora_mlp --lora_freeze_all_non_lora --lora_rank 8 --num_clients 10 --num_classes 4 --niid --alpha 1.
-python  -W ignore ./src/main.py --experiment_name "agnews_self_mlp" --wandb --wandb_project "FL-LLM-Lora" --dataset agnews --pretraining_rounds 200 --use_pretrained gpt2 --trust naive --lora_causal_self_attention --lora_mlp --lora_freeze_all_non_lora --lora_rank 8 --num_clients 10 --num_classes 4 --niid --alpha 1.
-python  -W ignore ./src/main.py --experiment_name "agnews_self_mlp" --wandb --wandb_project "FL-LLM-Lora" --dataset agnews --pretraining_rounds 200 --use_pretrained gpt2 --trust dynamic --lora_causal_self_attention --lora_mlp --lora_freeze_all_non_lora --lora_rank 8 --num_clients 10 --num_classes 4 --niid --alpha 1.
-
-
-python  -W ignore ./src/main.py --experiment_name "agnews_pat_self_mlp_static" --wandb --wandb_project "FL-LLM-Lora" --dataset agnews --pretraining_rounds 200 --use_pretrained gpt2 --trust static --lora_causal_self_attention --lora_mlp --lora_freeze_all_non_lora --lora_rank 8 --num_clients 5 --num_classes 4 --niid --partition pat &&
-python  -W ignore ./src/main.py --experiment_name "agnews_pat_self_mlp_naive" --wandb --wandb_project "FL-LLM-Lora" --dataset agnews --pretraining_rounds 200 --use_pretrained gpt2 --trust naive --lora_causal_self_attention --lora_mlp --lora_freeze_all_non_lora --lora_rank 8 --num_clients 5 --num_classes 4 --niid --partition pat &&
-python  -W ignore ./src/main.py --experiment_name "agnews_pat_self_mlp_dynamic" --wandb --wandb_project "FL-LLM-Lora" --dataset agnews --pretraining_rounds 200 --use_pretrained gpt2 --trust dynamic --lora_causal_self_attention --lora_mlp --lora_freeze_all_non_lora --lora_rank 8 --num_clients 5 --num_classes 4 --niid --partition pat
+python  -W ignore ./src/main.py --experiment_name "Trust comparison agnews" --wandb --wandb_project "fl-llm" --dataset agnews --trust none --lora_causal_self_attention --lora_mlp --lora_freeze_all_non_lora --lora_rank 8 --num_clients 5 --num_classes 4 --niid --partition pat &&
+python  -W ignore ./src/main.py --experiment_name "Trust comparison agnews" --wandb --wandb_project "fl-llm" --dataset agnews --trust naive --lora_causal_self_attention --lora_mlp --lora_freeze_all_non_lora --lora_rank 8 --num_clients 5 --num_classes 4 --niid --partition pat &&
+python  -W ignore ./src/main.py --experiment_name "Trust comparison agnews" --wandb --wandb_project "fl-llm" --dataset agnews --trust dynamic --lora_causal_self_attention --lora_mlp --lora_freeze_all_non_lora --lora_rank 8 --num_clients 5 --num_classes 4 --niid --partition pat

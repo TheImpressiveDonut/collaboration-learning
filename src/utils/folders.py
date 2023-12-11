@@ -30,9 +30,9 @@ def get_config_path(args: Namespace) -> str:
     return f'{__get_save_path(args, create_dir=True)}config.json'
 
 
-def get_save_train_test_ref_path(args: Namespace) -> Tuple[str, str, str]:
+def get_save_train_test_ref_stats_path(args: Namespace) -> Tuple[str, str, str, str]:
     path = __get_save_path(args, create_dir=True)
-    return f'{path}train.bz2', f'{path}test.bz2', f'{path}ref.bz2'
+    return f'{path}train.bz2', f'{path}test.bz2', f'{path}ref.bz2', f'{path}stats.bz2'
 
 
 def get_raw_path(dataset_name: DatasetName, create_dir: bool = True) -> str:

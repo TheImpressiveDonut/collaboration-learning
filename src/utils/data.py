@@ -81,8 +81,6 @@ def clients_split(data: Data, args: Namespace) -> Tuple[ClientsData, ClientsData
         case _:
             raise UnknownPartitionArgumentException(args.partition)
 
-
-
     # assign data
     for client in range(args.num_clients):
         idxs = data_idx_map[client]
@@ -92,12 +90,6 @@ def clients_split(data: Data, args: Namespace) -> Tuple[ClientsData, ClientsData
         vals, counts = np.unique(clients_data[client][1], return_counts=True)
         for val, count in zip(vals, counts):
             statistic[client].append((int(val), int(count)))
-
-    for client in range(args.num_clients):
-        print(f'Client {client}\t Size of data: {clients_data[client][0].shape[0]}\t Labels: ',
-              np.unique(clients_data[client][1]))
-        print(f'\t\t Samples of labels: ', [i for i in statistic[client]])
-        print('-' * 50)
 
     return clients_data, statistic
 

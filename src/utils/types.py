@@ -11,7 +11,7 @@ ClientsDataStatistics = List[DataStatistics]
 
 
 class TrustName(StrEnum):
-    static = auto()
+    none = auto()
     naive = auto()
     dynamic = auto()
 

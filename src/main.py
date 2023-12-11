@@ -12,10 +12,11 @@ from client.client import Client
 from client.model import GPTLoRA
 from data.utils import get_dataset
 from parser import get_args
+from utils.types import ClientsDataStatistics
 from trainer import Trainer
 
 
-def main(args: Namespace, dataset: Tuple[List[np.ndarray], List[np.ndarray]]) -> None:
+def main(args: Namespace, dataset: Tuple[List[np.ndarray], List[np.ndarray]], stats: ClientsDataStatistics) -> None:
     print('datasets used:', args.dataset)
     print('trust:', args.trust)
 
@@ -34,7 +35,21 @@ def main(args: Namespace, dataset: Tuple[List[np.ndarray], List[np.ndarray]]) ->
         print('num of gpus:', torch.cuda.device_count())
 
     if args.wandb:
-        wandb.init(project=args.wandb_project, name=f'{args.experiment_name}', config=vars(args))
+        wandb.init(project=args.wandb_project, group=f'{args.experiment_name}', config=vars(args))
+        unique = []
+        for i in range(args.num_clients):
+            for val, _ in stats[i]:
+                if val not in unique:
+                    unique.append(val)
+        unique = sorted(unique)
+        data = []
+        for i in range(args.num_clients):
+            data.append([0 for _ in range(len(unique) - 1)])
+            for val, count in stats[i]:
+                data[i][val] = count
+        stats = wandb.Table(columns=unique, data=data)
+        wandb.log({'Statistics': stats})
+
 
     train_data, val_data = dataset
 
@@ -43,7 +58,7 @@ def main(args: Namespace, dataset: Tuple[List[np.ndarray], List[np.ndarray]]) ->
         distributed_backend = distributed.make_backend_from_args(args)
         args_db = distributed_backend.get_adjusted_args_for_process(args)
         model = GPTLoRA.from_pretrained(args.use_pretrained, args_db, verbose=(id == 0)).to(args_db.device)
-        model.crop_sequence_length(512)
+        model.crop_sequence_length(args_db.sequence_length)
         model = distributed_backend.transform_model(model)
 
         group_specs = distributed_backend.get_raw_model(model).get_parameter_group_specs()
@@ -107,9 +122,12 @@ def main(args: Namespace, dataset: Tuple[List[np.ndarray], List[np.ndarray]]) ->
 if __name__ == '__main__':
     args = get_args()
 
-    train_data, val_data = get_dataset(args)
+    train_data, val_data, stats = get_dataset(args)
 
     print(f'Num training tokens: {[len(a) for a in train_data]}')
     print(f'Num validation tokens: {[len(a) for a in val_data]}')
+    for client in range(args.num_clients):
+        print(f'Client {client}\t Size of data: {train_data[client].shape[0]}')
+        print(f'\t\t Samples of labels: {[i for i in stats[client]]}')
 
-    main(args, (train_data, val_data))
+    main(args, (train_data, val_data), stats)

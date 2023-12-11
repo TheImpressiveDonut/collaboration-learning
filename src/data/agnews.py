@@ -8,12 +8,13 @@ import torchtext
 from utils.data import clients_split, train_test_ref_split
 from utils.folders import get_raw_path, check_if_config_exist
 from utils.memory import save_dataset, load_dataset
+from utils.types import ClientsDataStatistics
 
 
-def get_agnews_data(args: Namespace) -> Tuple[List[np.ndarray], List[np.ndarray]]:
+def get_agnews_data(args: Namespace) -> Tuple[List[np.ndarray], List[np.ndarray], ClientsDataStatistics]:
     if check_if_config_exist(args):
-        train, eval, _ = load_dataset(args)
-        return train, eval
+        (train, eval, _), stats = load_dataset(args)
+        return train, eval, stats
 
     raw_path = get_raw_path(args)
     trainset, testset = torchtext.datasets.AG_NEWS(root=raw_path)
@@ -48,6 +49,6 @@ def get_agnews_data(args: Namespace) -> Tuple[List[np.ndarray], List[np.ndarray]
         tokenized_train_data.append(train_tokenized)
         tokenized_test_data.append(test_tokenized)
 
-    save_dataset(tokenized_train_data, tokenized_test_data, [], args)
+    save_dataset(tokenized_train_data, tokenized_test_data, [], statistic, args)
 
-    return tokenized_train_data, tokenized_test_data
+    return tokenized_train_data, tokenized_test_data, statistic
