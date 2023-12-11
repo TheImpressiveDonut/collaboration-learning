@@ -19,7 +19,7 @@ def get_args() -> Namespace:
     parser.add_argument('--num_clients', required=True, type=int)
     parser.add_argument('--num_classes', required=True, type=int)
     parser.add_argument('--num_global_rounds', default=50, type=int)
-    parser.add_argument('--acc_steps', default=200, type=int)
+    parser.add_argument('--acc_steps', default=20, type=int)
     parser.add_argument('--pretraining_rounds', default=10, type=int)
     parser.add_argument('--eval_freq', default=200, type=int)
 
