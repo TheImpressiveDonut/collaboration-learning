@@ -44,7 +44,7 @@ def main(args: Namespace, dataset: Tuple[List[np.ndarray], List[np.ndarray]], st
         unique = sorted(unique)
         data = []
         for i in range(args.num_clients):
-            data.append([0 for _ in range(len(unique) - 1)])
+            data.append([0 for _ in range(len(unique))])
             for val, count in stats[i]:
                 data[i][val] = count
         stats = wandb.Table(columns=unique, data=data)
