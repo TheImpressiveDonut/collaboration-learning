@@ -8,11 +8,10 @@ https://github.com/huggingface/transformers/blob/main/src/transformers/models/gp
 """
 
 import math
-from argparse import Namespace
-
 import tiktoken
 import torch
 import torch.nn as nn
+from argparse import Namespace
 from torch import Tensor
 from torch.nn import functional as F
 from torch.nn.modules.module import T

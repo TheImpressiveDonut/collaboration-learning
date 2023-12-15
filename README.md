@@ -4,7 +4,7 @@ paper [Collaborative learning via Prediction Consensus](https://arxiv.org/abs/23
 ## Environment
 
 ```bash
-conda env create -f env.yml
+conda env create -f collabllm.yml
 conda activate collab-consensus
 ```
 

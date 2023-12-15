@@ -1,10 +1,9 @@
-from argparse import Namespace
-from argparse import Namespace
-from typing import List, Tuple
-
 import numpy as np
 import tiktoken
 import torchtext
+from argparse import Namespace
+from argparse import Namespace
+from typing import List, Tuple
 from utils.data import clients_split, train_test_ref_split
 from utils.folders import get_raw_path, check_if_config_exist
 from utils.memory import save_dataset, load_dataset

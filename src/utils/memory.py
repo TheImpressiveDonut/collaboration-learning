@@ -1,9 +1,8 @@
 import bz2
 import pickle
+import ujson
 from argparse import Namespace
 from typing import Any, Tuple
-
-import ujson
 
 from .folders import get_config_path, get_save_train_test_ref_stats_path
 from .types import ClientsData, Dataset, ClientsDataStatistics

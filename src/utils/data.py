@@ -1,8 +1,9 @@
-from argparse import Namespace
-from typing import List, Tuple
+import math
 
 import numpy as np
+from argparse import Namespace
 from sklearn.model_selection import train_test_split
+from typing import List, Tuple
 
 from .exceptions import UnknownPartitionArgumentException, UnknownSplitDataModeException
 from .types import ClientsData, Data, ClientsDataStatistics
@@ -19,7 +20,7 @@ def __get_pat_partition(dataset_label: np.ndarray, args: Namespace) -> List[np.n
     for i in range(args.num_classes):
         selected_clients = np.argwhere(class_num_per_client > 0).flatten()
         np.random.shuffle(selected_clients)
-        selected_clients = selected_clients[:int(args.num_clients / args.num_classes * args.class_per_client)]
+        selected_clients = selected_clients[:math.ceil(args.num_clients / args.num_classes * args.class_per_client)]
 
         num_all_samples = idx_for_each_class[i].shape[0]
         num_selected_clients = selected_clients.shape[0]

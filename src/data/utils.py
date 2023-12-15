@@ -1,7 +1,6 @@
+import numpy as np
 from argparse import Namespace
 from typing import Tuple, List
-
-import numpy as np
 from utils.exceptions import UnknownNameCustomEnumException
 from utils.types import DatasetName, ClientsDataStatistics
 

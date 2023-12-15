@@ -38,7 +38,7 @@ def get_args() -> Namespace:
     parser.add_argument('--opt', default='adamw', choices=['adamw', 'sgd'])
     parser.add_argument('--grad_clip', default=0.0, type=float)  # default value is 1.0 in NanoGPT
     parser.add_argument('--distributed_backend', default=None, type=str, required=False,
-                             choices=distributed.registered_backends())  # distributed backend type
+                        choices=distributed.registered_backends())  # distributed backend type
 
     parser.add_argument('--lora_rank', default=4, type=int)
     parser.add_argument('--lora_alpha', default=32., type=float)

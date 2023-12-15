@@ -1,12 +1,11 @@
-from argparse import Namespace
-from typing import Dict
-
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
 import torch
 import wandb
+from argparse import Namespace
 from tqdm import tqdm
+from typing import Dict
 
 from client.client import Client
 from utils.exceptions import UnknownNameCustomEnumException

@@ -1,19 +1,18 @@
 import inspect
-import random
-from argparse import Namespace
-from typing import Tuple, List
-
 import numpy as np
+import random
 import torch
 import wandb
+from argparse import Namespace
+from typing import Tuple, List
 
 import distributed
 from client.client import Client
 from client.model import GPTLoRA
 from data.utils import get_dataset
 from parser import get_args
-from utils.types import ClientsDataStatistics
 from trainer import Trainer
+from utils.types import ClientsDataStatistics
 
 
 def main(args: Namespace, dataset: Tuple[List[np.ndarray], List[np.ndarray]], stats: ClientsDataStatistics) -> None:

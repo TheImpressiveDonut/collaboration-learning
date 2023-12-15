@@ -1,7 +1,6 @@
+import numpy as np
 from enum import StrEnum, auto
 from typing import Tuple, List
-
-import numpy as np
 
 Data = Tuple[np.ndarray, np.ndarray]
 ClientsData = List[Data]

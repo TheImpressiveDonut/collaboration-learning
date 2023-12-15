@@ -1,7 +1,6 @@
-from contextlib import nullcontext
-
 import numpy as np
 import torch
+from contextlib import nullcontext
 
 
 def get_batch(data, seq_length, batch_size, device='cpu'):
