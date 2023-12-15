@@ -21,7 +21,7 @@ def get_args() -> Namespace:
     parser.add_argument('--num_global_rounds', default=50, type=int)
     parser.add_argument('--acc_steps', default=20, type=int)
     parser.add_argument('--pretraining_rounds', default=10, type=int)
-    parser.add_argument('--eval_freq', default=200, type=int)
+    parser.add_argument('--eval_freq', default=1, type=int)
 
     parser.add_argument('--batch_size', default=50, type=int)
     parser.add_argument('--lr', default=2e-3, type=float)
