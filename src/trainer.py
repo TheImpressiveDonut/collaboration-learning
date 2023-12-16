@@ -151,7 +151,7 @@ class Trainer(object):
         trust_weight = torch.softmax(trust_weight, dim=1)
 
         plt.figure(figsize=(15, 15))
-        plot = sns.heatmap(trust_weight.numpy(), annot=True, fmt='.3f')
+        plot = sns.heatmap(trust_weight.numpy(), annot=True, fmt='.3f', annot_kws={'size': 15})
         wandb.log({'Trust weights': wandb.Image(plot.get_figure())})
         plt.cla()
         plt.clf()
