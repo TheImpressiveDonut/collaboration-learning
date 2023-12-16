@@ -28,7 +28,7 @@ def main(args: Namespace, dataset: Tuple[List[np.ndarray], List[np.ndarray]], st
     np.random.seed(args.seed)
 
     # set torch devices
-    args.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    args.device = torch.device('cuda:1' if torch.cuda.is_available() else 'cpu')
     print('******* the device used is:', args.device)
     if args.device.type == 'cuda':
         print('num of gpus:', torch.cuda.device_count())
