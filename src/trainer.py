@@ -22,6 +22,7 @@ class Trainer(object):
         self.acc_steps = args.acc_steps
         self.trust = args.trust
         self.eval_freq = args.eval_freq
+        self.trust_freq = args.trust_freq
 
         self.train_losses = []
         self.val_losses = []
@@ -94,7 +95,7 @@ class Trainer(object):
                 self.val_accs[(current_global_epoch // self.eval_freq) - 1].append(val_acc)
 
         # trust update
-        if current_global_epoch > self.pretraining_rounds:
+        if current_global_epoch > self.pretraining_rounds and current_global_epoch % self.trust_freq == 0:
             match self.trust:
                 case TrustName.none:
                     pass

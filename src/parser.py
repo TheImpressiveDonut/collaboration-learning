@@ -28,6 +28,7 @@ def get_args() -> Namespace:
     parser.add_argument('--lambda_', default=0.5, type=float)
     parser.add_argument('--sequence_length', default=512, type=int)
     parser.add_argument('--trust', type=str, help='none, dynamic, naive')
+    parser.add_argument('--trust_freq', type=int, default=1)
 
     ##lora config
     parser.add_argument('--warmup_percent', default=0.04, type=float)
