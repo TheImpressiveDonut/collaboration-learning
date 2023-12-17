@@ -49,14 +49,14 @@ class Trainer(object):
                 val_loss = np.mean(self.val_losses[(current_global_epoch // self.eval_freq) - 1])
 
                 global_epochs.set_description(
-                    f'global epochs (local accuracy: {train_loss:.5f}[{train_loss - prev_train_loss:+.5f}]'
-                    f' | global accuracy: {val_loss:.5f}[{val_loss - prev_val_loss:+.5f}])'
+                    f'global epochs (train loss: {train_loss:.5f}[{train_loss - prev_train_loss:+.5f}]'
+                    f' | val loss: {val_loss:.5f}[{val_loss - prev_val_loss:+.5f}])'
                 )
 
                 wandb_dict = {
                     'global_epoch': current_global_epoch,
-                    'global_test_accuracy': train_loss,
-                    'global_ref_accuracy': val_loss
+                    'global_train_loss': train_loss,
+                    'global_val_loss': val_loss
                 }
 
                 for idx, acc in enumerate(self.train_losses[(current_global_epoch // self.eval_freq) - 1]):
@@ -143,7 +143,7 @@ class Trainer(object):
                     score = 0
 
                     for name in gradients.keys():
-                        cos = torch.cosine_similarity(gradients[name][id_1], gradients[name][id_2])
+                        cos = torch.cosine_similarity(gradients[name][id_1], gradients[name][id_2], dim=-1)
                         score += torch.mean(cos).item()
 
                     trust_weight[id_1, id_2] = score / len(gradients.keys())
