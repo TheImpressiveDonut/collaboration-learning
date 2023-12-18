@@ -44,8 +44,11 @@ def get_multi_wikitext_data(args: Namespace) -> Tuple[List[np.ndarray], List[np.
     tokenizer = tiktoken.get_encoding("gpt2")
     dataset_text = np.array(dataset_text)
     dataset_label = np.array(dataset_label)
+    print('sample 10\% of the data')
+    sampled_indices = np.random.choice(np.arange(len(dataset_label)), size=int(0.1 * len(dataset_label)),
+                                       replace=False).astype(int)
 
-    clients_data, statistic = clients_split((dataset_text, dataset_label), args)
+    clients_data, statistic = clients_split((dataset_text[sampled_indices], dataset_label[sampled_indices]), args)
     train_data, test_data, _ = train_test_ref_split(clients_data, args)
     tokenized_train_data = []
     tokenized_test_data = []
