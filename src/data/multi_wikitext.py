@@ -37,6 +37,7 @@ def get_multi_wikitext_data(args: Namespace) -> Tuple[List[np.ndarray], List[np.
             data_one_lang.save_to_disk(dataset_path)
         dataset_text.extend(data_one_lang['train']['text'])
         l = len(data_one_lang['train']['text'])
+        del data_one_lang
         dataset_label.extend([i] * l)
         i = i + 1
 
@@ -49,6 +50,8 @@ def get_multi_wikitext_data(args: Namespace) -> Tuple[List[np.ndarray], List[np.
                                        replace=False).astype(int)
 
     clients_data, statistic = clients_split((dataset_text[sampled_indices], dataset_label[sampled_indices]), args)
+    del dataset_text, dataset_label
+
     train_data, test_data, _ = train_test_ref_split(clients_data, args)
     tokenized_train_data = []
     tokenized_test_data = []
