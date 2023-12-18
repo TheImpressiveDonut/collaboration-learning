@@ -12,7 +12,7 @@ from utils.memory import load_dataset, save_dataset
 from utils.types import ClientsDataStatistics
 
 
-def get_agnews_data(args: Namespace) -> Tuple[List[np.ndarray], List[np.ndarray], ClientsDataStatistics]:
+def get_multi_wikitext_data(args: Namespace) -> Tuple[List[np.ndarray], List[np.ndarray], ClientsDataStatistics]:
     if check_if_config_exist(args):
         (train, eval, _), stats = load_dataset(args)
         return train, eval, stats

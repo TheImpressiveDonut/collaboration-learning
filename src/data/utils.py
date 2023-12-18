@@ -5,6 +5,7 @@ from utils.exceptions import UnknownNameCustomEnumException
 from utils.types import DatasetName, ClientsDataStatistics
 
 from .agnews import get_agnews_data
+from .multi_wikitext import get_multi_wikitext_data
 
 
 def get_dataset(args: Namespace) -> Tuple[List[np.ndarray], List[np.ndarray], ClientsDataStatistics]:
@@ -27,6 +28,6 @@ def get_dataset(args: Namespace) -> Tuple[List[np.ndarray], List[np.ndarray], Cl
         case DatasetName.agnews:
             return get_agnews_data(config)
         case DatasetName.multi_wikitext:
-            return
+            return get_multi_wikitext_data(config)
         case _:
             raise UnknownNameCustomEnumException(args.dataset, DatasetName)
