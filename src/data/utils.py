@@ -26,5 +26,7 @@ def get_dataset(args: Namespace) -> Tuple[List[np.ndarray], List[np.ndarray], Cl
     match args.dataset:
         case DatasetName.agnews:
             return get_agnews_data(config)
+        case DatasetName.multi_wikitext:
+            return
         case _:
             raise UnknownNameCustomEnumException(args.dataset, DatasetName)

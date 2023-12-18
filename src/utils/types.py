@@ -22,3 +22,4 @@ class ModeName(StrEnum):
 
 class DatasetName(StrEnum):
     agnews = auto()
+    multi_wikitext = auto()

@@ -1,12 +1,14 @@
+import os
 from argparse import Namespace
 from typing import List, Tuple
 
 import numpy as np
 import tiktoken
-import torchtext
+from datasets import load_from_disk
 from utils.data import clients_split, train_test_ref_split
-from utils.folders import get_raw_path, check_if_config_exist
-from utils.memory import save_dataset, load_dataset
+from utils.folders import check_if_config_exist
+from utils.folders import get_raw_path
+from utils.memory import load_dataset, save_dataset
 from utils.types import ClientsDataStatistics
 
 
@@ -16,25 +18,33 @@ def get_agnews_data(args: Namespace) -> Tuple[List[np.ndarray], List[np.ndarray]
         return train, eval, stats
 
     raw_path = get_raw_path(args)
-    trainset, testset = torchtext.datasets.AG_NEWS(root=raw_path)
 
-    trainlabel, traintext = list(zip(*trainset))
-    testlabel, testtext = list(zip(*testset))
+    # Get multi-lingual wikipedia data
+    print('This data downloading process might take a while... be patient.')
 
     dataset_text = []
     dataset_label = []
+    i = 0
+    for dataset_idx in ['20220301.de', '20220301.en',
+                        '20220301.fr', '20220301.it']:
+        dataset_path = os.path.join(raw_path, dataset_idx)
+        if os.path.isdir(dataset_path):
+            print('loading from disk: ', dataset_idx)
+            data_one_lang = load_from_disk(dataset_path)
+        else:
+            data_one_lang = load_dataset('wikipedia', dataset_idx)
+            data_one_lang.save_to_disk(dataset_path)
+        dataset_text.extend(data_one_lang['train']['text'])
+        l = len(data_one_lang['train']['text'])
+        dataset_label.extend([i] * l)
+        i = i + 1
 
-    dataset_text.extend(traintext)
-    dataset_text.extend(testtext)
-    dataset_label.extend(trainlabel)
-    dataset_label.extend(testlabel)
-    dataset_text = np.array(dataset_text)
+    # Tokenize the data
+    tokenizer = tiktoken.get_encoding("gpt2")
     dataset_label = np.array(dataset_label)
 
-    clients_data, statistic = clients_split((dataset_text, dataset_label - 1), args)
+    clients_data, statistic = clients_split((dataset_text, dataset_label), args)
     train_data, test_data, _ = train_test_ref_split(clients_data, args)
-
-    tokenizer = tiktoken.get_encoding('gpt2')
     tokenized_train_data = []
     tokenized_test_data = []
     for i in range(len(train_data)):
@@ -49,5 +59,4 @@ def get_agnews_data(args: Namespace) -> Tuple[List[np.ndarray], List[np.ndarray]
         tokenized_test_data.append(test_tokenized)
 
     save_dataset(tokenized_train_data, tokenized_test_data, [], statistic, args)
-
     return tokenized_train_data, tokenized_test_data, statistic

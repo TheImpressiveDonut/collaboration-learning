@@ -20,3 +20,7 @@ python -W ignore ./src/main.py --experiment_name "Trust comparison agnews" --wan
 ## CMD
 
 python -W ignore ./src/main.py --experiment_name "Trust comparison agnews" --wandb --wandb_project "fl-llm" --dataset agnews --trust dynamic --lora_causal_self_attention --lora_freeze_all_non_lora --num_clients 5 --num_classes 4 --niid --partition pat --debug
+
+
+
+python -W ignore ./src/main.py --experiment_name "Trust comparison multi" --wandb --wandb_project "fl-llm" --dataset multi_wikitext --trust dynamic --lora_causal_self_attention --lora_freeze_all_non_lora --num_clients 4 --num_classes 4 --niid --partition pat --debug
