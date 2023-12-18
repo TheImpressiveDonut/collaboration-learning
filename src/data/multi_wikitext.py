@@ -2,6 +2,7 @@ import os
 from argparse import Namespace
 from typing import List, Tuple
 
+import datasets
 import numpy as np
 import tiktoken
 from datasets import load_from_disk
@@ -32,7 +33,7 @@ def get_multi_wikitext_data(args: Namespace) -> Tuple[List[np.ndarray], List[np.
             print('loading from disk: ', dataset_idx)
             data_one_lang = load_from_disk(dataset_path)
         else:
-            data_one_lang = load_dataset('wikipedia', dataset_idx)
+            data_one_lang = datasets.load_dataset('wikipedia', dataset_idx)
             data_one_lang.save_to_disk(dataset_path)
         dataset_text.extend(data_one_lang['train']['text'])
         l = len(data_one_lang['train']['text'])
