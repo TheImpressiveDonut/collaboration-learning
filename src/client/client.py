@@ -1,12 +1,13 @@
-import numpy as np
-import torch
 import typing
 from argparse import Namespace
+from typing import Tuple, Dict
+
+import numpy as np
+import torch
 from distributed.backend import DistributedBackend
 from torch import Tensor
 from torch.optim import Optimizer
 from torch.optim.lr_scheduler import LRScheduler
-from typing import Tuple, Dict
 
 from .model import GPTLoRA
 from .utils import get_batch, eval
@@ -34,7 +35,7 @@ class Client(object):
         self.trust = args.trust
         self.lambda_ = args.lambda_
         self.grad_clip = args.grad_clip
-        self.sequence_length = self.model.config.sequence_length
+        self.sequence_length = 512  # self.model.config.sequence_length
         self.batch_size = args.batch_size
         self.type_ctx = torch.amp.autocast(device_type='cuda', dtype=torch.float16)
 
