@@ -92,6 +92,7 @@ def clients_split(data: Data, args: Namespace) -> Tuple[ClientsData, ClientsData
         for val, count in zip(vals, counts):
             statistic[client].append((int(val), int(count)))
 
+    del data, dataset_X, dataset_y
     return clients_data, statistic
 
 
@@ -123,4 +124,5 @@ def train_test_ref_split(clients_data: ClientsData, args: Namespace, mode: str =
         train_data.append((X_train, y_train))
         test_data.append((X_test, y_test))
 
+    del clients_data, X_test, X_train
     return train_data, test_data, ref_data

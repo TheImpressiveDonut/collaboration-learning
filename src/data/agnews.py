@@ -50,4 +50,5 @@ def get_agnews_data(args: Namespace) -> Tuple[List[np.ndarray], List[np.ndarray]
 
     save_dataset(tokenized_train_data, tokenized_test_data, [], statistic, args)
 
+    del raw_tokenized_train, raw_tokenized_eval, train_tokenized, test_tokenized
     return tokenized_train_data, tokenized_test_data, statistic

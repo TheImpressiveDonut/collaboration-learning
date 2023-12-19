@@ -27,7 +27,7 @@ def get_multi_wikitext_data(args: Namespace) -> Tuple[List[np.ndarray], List[np.
     dataset_label = []
     i = 0
     for dataset_idx in ['20220301.de', '20220301.it']:
-                        #'20220301.fr', '20220301.it']:
+                        #'20220301.fr', '20220301.en']:
         dataset_path = os.path.join(raw_path, dataset_idx)
         if os.path.isdir(dataset_path):
             print('loading from disk: ', dataset_idx)
