@@ -85,7 +85,7 @@ def clients_split(data: Data, args: Namespace) -> Tuple[ClientsData, ClientsData
     # assign data
     for client in range(args.num_clients):
         idxs = data_idx_map[client]
-        clients_data.append((dataset_X[idxs], dataset_y[idxs]))
+        clients_data.append(([dataset_X[i] for i in idxs], dataset_y[idxs]))
 
         statistic.append([])
         vals, counts = np.unique(clients_data[client][1], return_counts=True)

@@ -49,10 +49,9 @@ def get_multi_wikitext_data(args: Namespace) -> Tuple[List[np.ndarray], List[np.
                                        replace=False).astype(int)
     dataset_text = [dataset_text[ind] for ind in sampled_indices]
     print('data to numpy')
-    dataset_text = np.array(dataset_text)
-    print('numpy data done')
     dataset_label = np.array(dataset_label)
     dataset_label = np.array(dataset_label[sampled_indices])
+    print('numpy data done')
 
     clients_data, statistic = clients_split((dataset_text, dataset_label), args)
     del dataset_text, dataset_label
