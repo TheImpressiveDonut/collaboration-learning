@@ -15,7 +15,7 @@ def get_agnews_data(args: Namespace) -> Tuple[List[np.ndarray], List[np.ndarray]
         (train, eval, _), stats = load_dataset(args)
         return train, eval, stats
 
-    raw_path = get_raw_path(args)
+    raw_path = get_raw_path(args.dataset_name)
     trainset, testset = torchtext.datasets.AG_NEWS(root=raw_path)
 
     trainlabel, traintext = list(zip(*trainset))

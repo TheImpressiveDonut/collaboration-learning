@@ -18,7 +18,7 @@ def get_multi_wikitext_data(args: Namespace) -> Tuple[List[np.ndarray], List[np.
         (train, eval, _), stats = load_dataset(args)
         return train, eval, stats
 
-    raw_path = get_raw_path(args)
+    raw_path = get_raw_path(args.dataset_name)
 
     # Get multi-lingual wikipedia data
     print('This data downloading process might take a while... be patient.')
@@ -57,6 +57,8 @@ def get_multi_wikitext_data(args: Namespace) -> Tuple[List[np.ndarray], List[np.
     del dataset_text, dataset_label
 
     train_data, test_data, _ = train_test_ref_split(clients_data, args)
+
+    print('encoding data')
     tokenized_train_data = []
     tokenized_test_data = []
     for i in range(len(train_data)):
@@ -70,5 +72,6 @@ def get_multi_wikitext_data(args: Namespace) -> Tuple[List[np.ndarray], List[np.
         tokenized_train_data.append(train_tokenized)
         tokenized_test_data.append(test_tokenized)
 
+    print('save dataset')
     save_dataset(tokenized_train_data, tokenized_test_data, [], statistic, args)
     return tokenized_train_data, tokenized_test_data, statistic
