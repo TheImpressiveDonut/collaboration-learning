@@ -86,7 +86,7 @@ def main(args: Namespace, dataset: Tuple[List[np.ndarray], List[np.ndarray]], st
         if args_db.scheduler != 'none':
             if args_db.scheduler in ['cos', 'linear']:
                 scheduler = torch.optim.lr_scheduler.OneCycleLR(
-                    optimizer=opt, max_lr=args.lr, total_steps=args.iterations,
+                    optimizer=opt, max_lr=args.lr, total_steps=args.num_global_rounds,
                     pct_start=args.warmup_percent,
                     anneal_strategy=args.scheduler,
                     cycle_momentum=False, div_factor=1e2, final_div_factor=.05
