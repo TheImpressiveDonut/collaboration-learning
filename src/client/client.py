@@ -41,7 +41,6 @@ class Client(object):
 
     def train(self, acc_steps: int) -> None:
         self.model.train()
-        self.optimizer.zero_grad(set_to_none=True)
 
         for microstep_idx in range(acc_steps):  # gradient accumulation
             x, y = get_batch(self.train_data, self.sequence_length, self.batch_size, device=self.device)
@@ -58,6 +57,7 @@ class Client(object):
             torch.nn.utils.clip_grad_norm_(self.model.parameters(), self.grad_clip)
         self.optimizer.step()
         self.scheduler.step()
+        self.optimizer.zero_grad(set_to_none=True)
 
     def val(self) -> Tuple[float, float, float]:
         self.model.eval()
