@@ -1,12 +1,13 @@
 import inspect
-import numpy as np
 import random
-import torch
-import wandb
 from argparse import Namespace
 from typing import Tuple, List
 
+import numpy as np
+import torch
+
 import distributed
+import wandb
 from client.client import Client
 from client.model import GPTLoRA
 from data.utils import get_dataset
@@ -49,7 +50,6 @@ def main(args: Namespace, dataset: Tuple[List[np.ndarray], List[np.ndarray]], st
         stats = wandb.Table(columns=unique, data=data)
         wandb.log({'Statistics': stats})
 
-
     train_data, val_data = dataset
 
     clients = {}
@@ -57,7 +57,7 @@ def main(args: Namespace, dataset: Tuple[List[np.ndarray], List[np.ndarray]], st
         distributed_backend = distributed.make_backend_from_args(args)
         args_db = distributed_backend.get_adjusted_args_for_process(args)
         model = GPTLoRA.from_pretrained(args.use_pretrained, args_db, verbose=(id == 0)).to(args_db.device)
-        #model.crop_sequence_length(args_db.sequence_length)
+        # model.crop_sequence_length(args_db.sequence_length)
         model = distributed_backend.transform_model(model)
 
         group_specs = distributed_backend.get_raw_model(model).get_parameter_group_specs()
@@ -86,12 +86,10 @@ def main(args: Namespace, dataset: Tuple[List[np.ndarray], List[np.ndarray]], st
         if args_db.scheduler != 'none':
             if args_db.scheduler in ['cos', 'linear']:
                 scheduler = torch.optim.lr_scheduler.OneCycleLR(
-                    optimizer=opt, max_lr=args_db.lr,
-                    total_steps=args.num_global_rounds,
-                    pct_start=args_db.warmup_percent,
-                    anneal_strategy=args_db.scheduler,
-                    cycle_momentum=False, div_factor=1e2,
-                    final_div_factor=1e4
+                    optimizer=opt, max_lr=args.lr, total_steps=args.iterations,
+                    pct_start=args.warmup_percent,
+                    anneal_strategy=args.scheduler,
+                    cycle_momentum=False, div_factor=1e2, final_div_factor=.05
                 )
             else:
                 raise NotImplementedError(f"Unknown scheduler type: {args_db.scheduler}.")

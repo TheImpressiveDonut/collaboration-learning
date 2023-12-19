@@ -31,7 +31,7 @@ def get_args() -> Namespace:
     parser.add_argument('--trust_freq', type=int, default=1)
 
     ##lora config
-    parser.add_argument('--warmup_percent', default=0.04, type=float)
+    parser.add_argument('--warmup_percent', default=0.02, type=float)
     parser.add_argument('--weight_decay', default=1e-3, type=float)
     parser.add_argument('--beta1', default=0.9, type=float)
     parser.add_argument('--beta2', default=0.95, type=float)
