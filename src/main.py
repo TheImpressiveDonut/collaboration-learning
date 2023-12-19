@@ -63,7 +63,6 @@ def main(args: Namespace, dataset: Tuple[List[np.ndarray], List[np.ndarray]], st
         group_specs = distributed_backend.get_raw_model(model).get_parameter_group_specs()
         param_name_mapping = {p_name: p for p_name, p in model.named_parameters()}
         optimized_params_cnt = 0
-        optimized_required_params_cnt = 0
         for g in group_specs:
             params = []
             for p_name in g["params"]:
@@ -71,14 +70,8 @@ def main(args: Namespace, dataset: Tuple[List[np.ndarray], List[np.ndarray]], st
                 params += [param_name_mapping[p_name] for p_name in translated_p_names]
             g["params"] = params
             optimized_params_cnt += sum([p.numel() for p in g["params"]])
-            optimized_required_params_cnt += sum([p.numel() if p.requires_grad else 0 for p in g["params"]])
         if id == 0:
             print("number of optimized parameters: %.2fM" % (optimized_params_cnt / 1e6,))
-            print("number of required optimized parameters: %.2fM" % (optimized_required_params_cnt / 1e6,))
-
-        for g in group_specs:
-            params = [p for p in g["params"] if p.requires_grad]
-            g["params"] = params
 
         if args_db.opt == 'adamw':
             use_fused = ('fused' in inspect.signature(torch.optim.AdamW).parameters)
